@@ -6,8 +6,6 @@ PyCharm Plugin for Pypendency
 - The plugin requires **python3** to be installed.
 - **Pypendency** must also be installed. https://pypi.org/project/pypendency/
 
-#### Install py
-
 #### FQN Generator
 Copy the pypendency FQN generator to the following location:
 
