@@ -19,7 +19,7 @@ intellij {
     version '2020.1.2'
     type 'PY'
     plugins 'yaml'
-    pluginName 'pypendency'
+    pluginName 'pycharm-pypendency'
 }
 patchPluginXml {
     changeNotes """Version 0.1<br>Yaml FQN suggestions"""
