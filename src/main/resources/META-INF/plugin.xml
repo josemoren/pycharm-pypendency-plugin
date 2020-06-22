@@ -21,6 +21,9 @@
     </extensions>
 
     <actions>
-        <!-- Add your actions here -->
+        <action id="GotoPypendency" class="org.fever.GotoPypendencyOrCodeAction" description="Pypendency" popup="true" text="Pypendency">
+            <add-to-group group-id="GoToCodeGroup" anchor="after" relative-to-action="GotoTest"/>
+            <add-to-group group-id="EditorPopupMenu.GoTo"/>
+        </action>
     </actions>
 </idea-plugin>
