@@ -11,10 +11,11 @@ import org.fever.GotoPypendencyOrCodeHandler;
 import org.jetbrains.annotations.NotNull;
 
 public class GotoPypendencyOrCodeAction extends PresentableActionHandlerBasedAction {
+    AnActionEvent e;
     @Override
     @NotNull
     protected CodeInsightActionHandler getHandler(){
-        return new GotoPypendencyOrCodeHandler();
+        return new GotoPypendencyOrCodeHandler(this.e);
     }
 
     @Override
@@ -24,11 +25,14 @@ public class GotoPypendencyOrCodeAction extends PresentableActionHandlerBasedAct
         presentation.setText("Pypendency");
         presentation.setDescription("Open pypendency definition...");
         super.update(e);
+        this.e = e;
+        System.out.println("aqui conozco el evento...");
     }
 
     @NotNull
     @Override
     protected LanguageExtension<CodeInsightActionHandler> getLanguageExtension() {
         return CodeInsightActions.GOTO_SUPER;
+//        return null;
     }
 }
