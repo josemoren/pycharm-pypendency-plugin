@@ -70,7 +70,7 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
             @Override
             public String getText() {
                 String text = null;
-                return ObjectUtils.notNull(text, "Create new pypendency yaml...");
+                return ObjectUtils.notNull(text, "Create new yaml definition...");
             }
 
             @Override
@@ -81,6 +81,25 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
             @Override
             public void execute() {
                 self.createPypendencyYaml(editor, file);
+            }
+        });
+
+        actions.add(new AdditionalAction() {
+            @NotNull
+            @Override
+            public String getText() {
+                String text = null;
+                return ObjectUtils.notNull(text, "Create new python definition...");
+            }
+
+            @Override
+            public Icon getIcon() {
+                return ObjectUtils.notNull(null, AllIcons.Actions.IntentionBulb);
+            }
+
+            @Override
+            public void execute() {
+                self.createPypendencyPython(editor, file);
             }
         });
 
@@ -138,6 +157,58 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
 
         PsiFile psiFile = PsiFileFactory.getInstance(file.getProject()).createFileFromText(
                 file.getName().replace(".py", ".yaml"), YAMLFileType.YML, fqn + ":\n    fqn: " + fqn);
+
+        PsiFile new_file = WriteAction.compute(
+                () -> (PsiFile) directory.add(psiFile)
+        );
+        FileEditorManager.getInstance(editor.getProject()).openFile(new_file.getVirtualFile(), true);
+    }
+
+    private void createPypendencyPython(Editor editor, PsiFile file) {
+        VirtualFile diPath = this.getDIPath(file);
+
+        if (diPath == null) return;
+
+        String relativePath = VfsUtilCore.getRelativePath(file.getParent().getVirtualFile(), diPath.getParent());
+        String diNewPath = diPath.getCanonicalPath() + "/" + relativePath;
+
+        PsiDirectory directory = WriteAction.compute(
+                () -> DirectoryUtil.mkdirs(PsiManager.getInstance(editor.getProject()), diNewPath)
+        );
+
+        AnAction action = ActionManager.getInstance().getAction(IdeActions.ACTION_COPY_REFERENCE);
+        action.actionPerformed(this.e);
+        Transferable [] transferables = CopyPasteManager.getInstance().getAllContents();
+
+        String fqn = null;
+        try {
+            fqn = transferables[transferables.length-1].getTransferData(DataFlavor.stringFlavor).toString();
+        } catch (UnsupportedFlavorException unsupportedFlavorException) {
+            unsupportedFlavorException.printStackTrace();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+        String text = "from pypendency.argument import Argument\n" +
+                "from pypendency.builder import ContainerBuilder\n" +
+                "from pypendency.definition import Definition\n" +
+                "\n" +
+                "from django.conf import settings\n" +
+                "\n" +
+                "\n" +
+                "def load(container_builder: ContainerBuilder):\n" +
+                "    container_builder.set_definition(\n" +
+                "        Definition(\n" +
+                "            \"" + fqn + "\",\n" +
+                "            \"" + fqn + "\",\n" +
+                "            [\n" +
+                "                Argument.no_kw_argument(),\n" +
+                "            ],\n" +
+                "        )\n" +
+                "    )\n" +
+                "";
+        PsiFile psiFile = PsiFileFactory.getInstance(file.getProject()).createFileFromText(
+                file.getName(), YAMLFileType.YML, text);
 
         PsiFile new_file = WriteAction.compute(
                 () -> (PsiFile) directory.add(psiFile)
