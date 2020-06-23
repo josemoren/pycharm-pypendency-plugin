@@ -101,6 +101,13 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
             );
         }
 
+        diFile = diNewPath + "/" + file.getName();
+        if (FileUtil.exists(diFile)) {
+            return PsiManager.getInstance(file.getProject()).findFile(
+                    LocalFileSystem.getInstance().findFileByPath(diFile)
+            );
+        }
+
         return null;
     }
 
