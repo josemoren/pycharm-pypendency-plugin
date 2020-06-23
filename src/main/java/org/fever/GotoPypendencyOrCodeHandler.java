@@ -2,20 +2,21 @@ package org.fever;
 
 import com.intellij.codeInsight.navigation.GotoTargetHandler;
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.actions.CreateFileAction;
-import com.intellij.navigation.ItemPresentation;
+import com.intellij.ide.util.DirectoryUtil;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.IdeActions;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
+import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtilCore;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.ObjectUtils;
 import com.intellij.util.SmartList;
@@ -44,9 +45,25 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
     }
 
     @Override
+    protected @NotNull String getChooserTitle(@NotNull PsiElement sourceElement, @Nullable String name, int length, boolean finished) {
+        return "Pypendency actions";
+    }
+
+    @Override
     protected @Nullable GotoData getSourceAndTargetElements(Editor editor, PsiFile file) {
         List<AdditionalAction> actions = new SmartList<>();
         GotoPypendencyOrCodeHandler self = this;
+
+        PsiFile pypendencyDefinition = this.getPypendencyDefinition(file);
+
+        if (pypendencyDefinition != null) {
+            PsiElement[] targets = new PsiElement[] {pypendencyDefinition};
+            return new GotoData(
+                    PsiUtilCore.getElementAtOffset(file, editor.getCaretModel().getOffset()),
+                    targets,
+                    actions
+            );
+        }
 
         actions.add(new AdditionalAction() {
             @NotNull
@@ -70,8 +87,35 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
         return new GotoData(PsiUtilCore.getElementAtOffset(file, editor.getCaretModel().getOffset()), PsiElement.EMPTY_ARRAY, actions);
     }
 
+    private PsiFile getPypendencyDefinition(PsiFile file) {
+        VirtualFile diPath = this.getDIPath(file);
+        if (diPath == null) return null;
+        String relativePath = VfsUtilCore.getRelativePath(file.getParent().getVirtualFile(), diPath.getParent());
+        String diNewPath = diPath.getCanonicalPath() + "/" + relativePath;
+        String yamlName = file.getName().replace(".py", ".yaml");
+
+        String diFile = diNewPath + "/" + yamlName;
+        if (FileUtil.exists(diFile)) {
+            return PsiManager.getInstance(file.getProject()).findFile(
+                    LocalFileSystem.getInstance().findFileByPath(diFile)
+            );
+        }
+
+        return null;
+    }
+
     private void createPypendencyYaml(Editor editor, PsiFile file) {
-        System.out.println("I want to create a new YAML!");
+        VirtualFile diPath = this.getDIPath(file);
+
+        if (diPath == null) return;
+
+        String relativePath = VfsUtilCore.getRelativePath(file.getParent().getVirtualFile(), diPath.getParent());
+        String diNewPath = diPath.getCanonicalPath() + "/" + relativePath;
+
+        PsiDirectory directory = WriteAction.compute(
+                () -> DirectoryUtil.mkdirs(PsiManager.getInstance(editor.getProject()), diNewPath)
+        );
+
         AnAction action = ActionManager.getInstance().getAction(IdeActions.ACTION_COPY_REFERENCE);
         action.actionPerformed(this.e);
         Transferable [] transferables = CopyPasteManager.getInstance().getAllContents();
@@ -84,11 +128,33 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
-        PsiFile psiFile = PsiFileFactory.getInstance(file.getProject()).createFileFromText("hola.yaml", YAMLFileType.YML, fqn + ":\n    fqn: " + fqn);
-        PsiFile new_file = (PsiFile) file.getContainingDirectory().add(psiFile);
+
+        PsiFile psiFile = PsiFileFactory.getInstance(file.getProject()).createFileFromText(
+                file.getName().replace(".py", ".yaml"), YAMLFileType.YML, fqn + ":\n    fqn: " + fqn);
+
+        PsiFile new_file = WriteAction.compute(
+                () -> (PsiFile) directory.add(psiFile)
+        );
         FileEditorManager.getInstance(editor.getProject()).openFile(new_file.getVirtualFile(), true);
-        System.out.println("...");
     }
+
+    private VirtualFile getDIPath(PsiFile file) {
+        PsiDirectory directory = file.getParent();
+
+        while(directory != null) {
+            String directoryPath = directory.getVirtualFile().getCanonicalPath();
+
+            if (FileUtil.exists(directoryPath + "/_dependency_injection/"))
+            {
+                return LocalFileSystem.getInstance().findFileByPath(directoryPath + "/_dependency_injection/");
+            }
+
+            directory = directory.getParent();
+        }
+
+        return null;
+    }
+
 
     @Override
     protected @NotNull String getNotFoundMessage(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
