@@ -2,15 +2,12 @@ package org.fever;
 
 import com.intellij.codeInsight.navigation.GotoTargetHandler;
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.actions.QualifiedNameProviderUtil;
 import com.intellij.ide.util.DirectoryUtil;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -25,15 +22,13 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.yaml.YAMLFileType;
 
 import javax.swing.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.util.List;
 
 
 public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
     AnActionEvent e;
+    String currentFQN = null;
+
     public GotoPypendencyOrCodeHandler(AnActionEvent e) {
         super();
         this.e = e;
@@ -51,6 +46,11 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
 
     @Override
     protected @Nullable GotoData getSourceAndTargetElements(Editor editor, PsiFile file) {
+        int caretOffset = editor.getCaretModel().getOffset();
+        PsiElement element = file.findElementAt(caretOffset);
+        this.currentFQN = QualifiedNameProviderUtil.getQualifiedName(element.getParent());
+        if (this.currentFQN == null) return null;
+
         List<AdditionalAction> actions = new SmartList<>();
         GotoPypendencyOrCodeHandler self = this;
 
@@ -142,19 +142,7 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
                 () -> DirectoryUtil.mkdirs(PsiManager.getInstance(editor.getProject()), diNewPath)
         );
 
-        AnAction action = ActionManager.getInstance().getAction(IdeActions.ACTION_COPY_REFERENCE);
-        action.actionPerformed(this.e);
-        Transferable [] transferables = CopyPasteManager.getInstance().getAllContents();
-
-        String fqn = null;
-        try {
-            fqn = transferables[transferables.length-1].getTransferData(DataFlavor.stringFlavor).toString();
-        } catch (UnsupportedFlavorException unsupportedFlavorException) {
-            unsupportedFlavorException.printStackTrace();
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
-
+        String fqn = this.currentFQN;
         PsiFile psiFile = PsiFileFactory.getInstance(file.getProject()).createFileFromText(
                 file.getName().replace(".py", ".yaml"), YAMLFileType.YML, fqn + ":\n    fqn: " + fqn);
 
@@ -176,19 +164,7 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
                 () -> DirectoryUtil.mkdirs(PsiManager.getInstance(editor.getProject()), diNewPath)
         );
 
-        AnAction action = ActionManager.getInstance().getAction(IdeActions.ACTION_COPY_REFERENCE);
-        action.actionPerformed(this.e);
-        Transferable [] transferables = CopyPasteManager.getInstance().getAllContents();
-
-        String fqn = null;
-        try {
-            fqn = transferables[transferables.length-1].getTransferData(DataFlavor.stringFlavor).toString();
-        } catch (UnsupportedFlavorException unsupportedFlavorException) {
-            unsupportedFlavorException.printStackTrace();
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
-
+        String fqn = this.currentFQN;
         String text = "from pypendency.argument import Argument\n" +
                 "from pypendency.builder import ContainerBuilder\n" +
                 "from pypendency.definition import Definition\n" +
