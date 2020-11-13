@@ -14,7 +14,6 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.SmartList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -68,20 +67,28 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
             return null;
         }
 
-        List<AdditionalAction> actions = new SmartList<>();
-        GotoPypendencyOrCodeHandler self = this;
-
         PsiFile pypendencyDefinition = this.getPypendencyDefinition(file);
 
         if (pypendencyDefinition != null) {
-            PsiElement[] targets = new PsiElement[]{pypendencyDefinition};
-            return new GotoData(
-                    elementUnderCaret,
-                    targets,
-                    actions
-            );
+            return getGotoDataForExistingPypendency(elementUnderCaret, pypendencyDefinition);
         }
 
+        return getGotoDataForNewPypendency(editor, file, elementUnderCaret, this);
+    }
+
+    @NotNull
+    private GotoTargetHandler.@Nullable GotoData getGotoDataForExistingPypendency(PsiElement elementUnderCaret, PsiFile pypendencyDefinition) {
+        PsiElement[] targets = new PsiElement[]{pypendencyDefinition};
+        return new GotoData(
+                elementUnderCaret,
+                targets,
+                new SmartList<>()
+        );
+    }
+
+    @NotNull
+    private GotoTargetHandler.@Nullable GotoData getGotoDataForNewPypendency(Editor editor, PsiFile file, PsiElement elementUnderCaret, GotoPypendencyOrCodeHandler self) {
+        List<AdditionalAction> actions = new SmartList<>();
         actions.add(new AdditionalAction() {
             @NotNull
             @Override
