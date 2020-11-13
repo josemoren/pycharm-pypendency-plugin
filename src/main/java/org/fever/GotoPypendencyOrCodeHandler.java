@@ -57,10 +57,10 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
             return null;
         }
 
-        PsiFile pypendencyDefinition = this.getPypendencyDefinition(file);
+        PsiFile pypendencyDefinitionFile = this.getPypendencyDefinition(file);
 
-        if (pypendencyDefinition != null) {
-            return getGotoDataForExistingPypendency(elementUnderCaret, pypendencyDefinition);
+        if (pypendencyDefinitionFile != null) {
+            return getGotoDataForExistingPypendency(elementUnderCaret, pypendencyDefinitionFile);
         }
 
         return getGotoDataForNewPypendency(editor, file, elementUnderCaret, this);
@@ -132,14 +132,10 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
 
     private @Nullable PsiFile getPypendencyDefinition(PsiFile file) {
         VirtualFile diPath = this.getDIPath(file);
-        if (diPath == null) {
-            return null;
-        }
+        assert diPath != null;
 
         PsiDirectory fileParent = file.getParent();
-        if (fileParent == null) {
-            return null;
-        }
+        assert fileParent != null;
 
         String relativePath = VfsUtilCore.getRelativePath(fileParent.getVirtualFile(), diPath.getParent());
         String diNewPath = diPath.getCanonicalPath() + "/" + relativePath;
@@ -167,69 +163,61 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
     }
 
     private void createPypendencyYaml(Editor editor, PsiFile file) {
-        VirtualFile diPath = this.getDIPath(file);
-        if (diPath == null) {
-            return;
-        }
+        PsiDirectory directory = makePypendencyDirectoryForFile(file);
+        PsiFile psiFile = this.createYamlWithContent(editor, file);
 
-        Project editorProject = editor.getProject();
-        if (editorProject == null) {
-            return;
-        }
+        PsiFile new_file = WriteAction.compute(
+                () -> (PsiFile) directory.add(psiFile)
+        );
+
+        Project fileProject = file.getProject();
+        FileEditorManager.getInstance(fileProject).openFile(new_file.getVirtualFile(), true);
+    }
+
+    private PsiFile createYamlWithContent(Editor editor, PsiFile file) {
+        String fqn = this.getCurrentFQN(editor, file);
+        String yamlFileName = file.getName().replace(".py", ".yaml");
+        String yamlFileContent = fqn + ":\n    fqn: " + fqn;
+        Project fileProject = file.getProject();
+
+        return PsiFileFactory.getInstance(fileProject).createFileFromText(
+                yamlFileName,
+                YAMLFileType.YML,
+                yamlFileContent
+        );
+    }
+
+    private PsiDirectory makePypendencyDirectoryForFile(PsiFile file) {
+        VirtualFile diPath = this.getDIPath(file);
+        assert diPath != null;
 
         PsiDirectory fileParent = file.getParent();
-        if (fileParent == null) {
-            return;
-        }
+        assert fileParent != null;
 
         VirtualFile parentVirtualFile = fileParent.getVirtualFile();
         String relativePath = VfsUtilCore.getRelativePath(parentVirtualFile, diPath.getParent());
         String diNewPath = diPath.getCanonicalPath() + "/" + relativePath;
 
-        PsiDirectory directory = WriteAction.compute(
-                () -> DirectoryUtil.mkdirs(PsiManager.getInstance(editorProject), diNewPath)
+        Project fileProject = file.getProject();
+        return WriteAction.compute(
+                () -> DirectoryUtil.mkdirs(PsiManager.getInstance(fileProject), diNewPath)
         );
+    }
 
-        String fqn = this.getCurrentFQN(editor, file);
-        if (fqn == null) {
-            return;
-        }
-        PsiFile psiFile = PsiFileFactory.getInstance(file.getProject()).createFileFromText(
-                file.getName().replace(".py", ".yaml"), YAMLFileType.YML, fqn + ":\n    fqn: " + fqn);
+    private void createPypendencyPython(Editor editor, PsiFile file) {
+        PsiDirectory directory = makePypendencyDirectoryForFile(file);
+        PsiFile psiFile = this.createPythonFileWithContent(editor, file);
 
         PsiFile new_file = WriteAction.compute(
                 () -> (PsiFile) directory.add(psiFile)
         );
-        FileEditorManager.getInstance(editorProject).openFile(new_file.getVirtualFile(), true);
+        Project fileProject = file.getProject();
+        FileEditorManager.getInstance(fileProject).openFile(new_file.getVirtualFile(), true);
     }
 
-    private void createPypendencyPython(Editor editor, PsiFile file) {
-        VirtualFile diPath = this.getDIPath(file);
-
-        if (diPath == null) {
-            return;
-        }
-
-        Project editorProject = editor.getProject();
-        if (editorProject == null) {
-            return;
-        }
-
-        PsiDirectory fileParent = file.getParent();
-        if (fileParent == null) {
-            return;
-        }
-
-        String relativePath = VfsUtilCore.getRelativePath(fileParent.getVirtualFile(), diPath.getParent());
-        String diNewPath = diPath.getCanonicalPath() + "/" + relativePath;
-        PsiDirectory directory = WriteAction.compute(
-                () -> DirectoryUtil.mkdirs(PsiManager.getInstance(editorProject), diNewPath)
-        );
-
+    private PsiFile createPythonFileWithContent(Editor editor, PsiFile file) {
         String fqn = this.getCurrentFQN(editor, file);
-        if (fqn == null) {
-            return;
-        }
+
         String text = "from pypendency.argument import Argument\n" +
                 "from pypendency.builder import ContainerBuilder\n" +
                 "from pypendency.definition import Definition\n" +
@@ -248,13 +236,14 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
                 "        )\n" +
                 "    )\n" +
                 "";
-        PsiFile psiFile = PsiFileFactory.getInstance(file.getProject()).createFileFromText(
-                file.getName(), YAMLFileType.YML, text);
 
-        PsiFile new_file = WriteAction.compute(
-                () -> (PsiFile) directory.add(psiFile)
+        Project fileProject = file.getProject();
+
+        return PsiFileFactory.getInstance(fileProject).createFileFromText(
+                file.getName(),
+                YAMLFileType.YML,
+                text
         );
-        FileEditorManager.getInstance(editorProject).openFile(new_file.getVirtualFile(), true);
     }
 
     private @Nullable VirtualFile getDIPath(@NotNull PsiFile file) {
