@@ -1,5 +1,5 @@
 # pycharm-pypendency-plugin
-PyCharm Plugin for Pypendency
+PyCharm Plugin for ![Pypendency](https://pypi.org/project/pypendency/)
 
 The plugin provides navigation for Pypendency files.
 
