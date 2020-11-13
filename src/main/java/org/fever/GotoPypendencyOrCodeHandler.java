@@ -29,9 +29,9 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
     public static final String CREATE_NEW_YAML_DEFINITION = "Create new yaml definition...";
     public static final String CREATE_NEW_PYTHON_DEFINITION = "Create new python definition...";
     public static final String NOT_FOUND = "Not found";
+    public static final String DEPENDENCY_INJECTION_FOLDER = "/_dependency_injection/";
 
     AnActionEvent anActionEvent;
-    String currentFQN = null;
 
     public GotoPypendencyOrCodeHandler(AnActionEvent anActionEvent) {
         super();
@@ -57,16 +57,6 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
             return null;
         }
 
-        PsiElement elementParent = elementUnderCaret.getParent();
-        if (elementParent == null) {
-            return null;
-        }
-
-        this.currentFQN = QualifiedNameProviderUtil.getQualifiedName(elementParent);
-        if (this.currentFQN == null) {
-            return null;
-        }
-
         PsiFile pypendencyDefinition = this.getPypendencyDefinition(file);
 
         if (pypendencyDefinition != null) {
@@ -74,6 +64,18 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
         }
 
         return getGotoDataForNewPypendency(editor, file, elementUnderCaret, this);
+    }
+
+    private @Nullable String getCurrentFQN(Editor editor, PsiFile file) {
+        int caretOffset = editor.getCaretModel().getOffset();
+        PsiElement elementUnderCaret = file.findElementAt(caretOffset);
+
+        PsiElement elementParent = elementUnderCaret.getParent();
+        if (elementParent == null) {
+            return null;
+        }
+
+        return QualifiedNameProviderUtil.getQualifiedName(elementParent);
     }
 
     @NotNull
@@ -188,7 +190,10 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
                 () -> DirectoryUtil.mkdirs(PsiManager.getInstance(editorProject), diNewPath)
         );
 
-        String fqn = this.currentFQN;
+        String fqn = this.getCurrentFQN(editor, file);
+        if (fqn == null) {
+            return;
+        }
         PsiFile psiFile = PsiFileFactory.getInstance(file.getProject()).createFileFromText(
                 file.getName().replace(".py", ".yaml"), YAMLFileType.YML, fqn + ":\n    fqn: " + fqn);
 
@@ -221,7 +226,10 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
                 () -> DirectoryUtil.mkdirs(PsiManager.getInstance(editorProject), diNewPath)
         );
 
-        String fqn = this.currentFQN;
+        String fqn = this.getCurrentFQN(editor, file);
+        if (fqn == null) {
+            return;
+        }
         String text = "from pypendency.argument import Argument\n" +
                 "from pypendency.builder import ContainerBuilder\n" +
                 "from pypendency.definition import Definition\n" +
@@ -255,8 +263,8 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
         while (directory != null) {
             String directoryPath = directory.getVirtualFile().getCanonicalPath();
 
-            if (FileUtil.exists(directoryPath + "/_dependency_injection/")) {
-                return LocalFileSystem.getInstance().findFileByPath(directoryPath + "/_dependency_injection/");
+            if (FileUtil.exists(directoryPath + DEPENDENCY_INJECTION_FOLDER)) {
+                return LocalFileSystem.getInstance().findFileByPath(directoryPath + DEPENDENCY_INJECTION_FOLDER);
             }
 
             directory = directory.getParent();
