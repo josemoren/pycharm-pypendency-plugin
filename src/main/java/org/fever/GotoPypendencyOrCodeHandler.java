@@ -52,12 +52,13 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
     @Override
     protected @Nullable GotoData getSourceAndTargetElements(Editor editor, PsiFile file) {
         int caretOffset = editor.getCaretModel().getOffset();
-        PsiElement element = file.findElementAt(caretOffset);
-        if (element == null) {
+        PsiElement elementUnderCaret = file.findElementAt(caretOffset);
+
+        if (elementUnderCaret == null) {
             return null;
         }
 
-        PsiElement elementParent = element.getParent();
+        PsiElement elementParent = elementUnderCaret.getParent();
         if (elementParent == null) {
             return null;
         }
@@ -75,7 +76,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
         if (pypendencyDefinition != null) {
             PsiElement[] targets = new PsiElement[]{pypendencyDefinition};
             return new GotoData(
-                    PsiUtilCore.getElementAtOffset(file, editor.getCaretModel().getOffset()),
+                    elementUnderCaret,
                     targets,
                     actions
             );
@@ -117,7 +118,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
             }
         });
 
-        return new GotoData(PsiUtilCore.getElementAtOffset(file, editor.getCaretModel().getOffset()), PsiElement.EMPTY_ARRAY, actions);
+        return new GotoData(elementUnderCaret, PsiElement.EMPTY_ARRAY, actions);
     }
 
     private @Nullable PsiFile getPypendencyDefinition(PsiFile file) {
