@@ -15,7 +15,6 @@ import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiUtilCore;
-import com.intellij.util.ObjectUtils;
 import com.intellij.util.SmartList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,8 +53,19 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
     protected @Nullable GotoData getSourceAndTargetElements(Editor editor, PsiFile file) {
         int caretOffset = editor.getCaretModel().getOffset();
         PsiElement element = file.findElementAt(caretOffset);
-        this.currentFQN = QualifiedNameProviderUtil.getQualifiedName(element.getParent());
-        if (this.currentFQN == null) return null;
+        if (element == null) {
+            return null;
+        }
+
+        PsiElement elementParent = element.getParent();
+        if (elementParent == null) {
+            return null;
+        }
+
+        this.currentFQN = QualifiedNameProviderUtil.getQualifiedName(elementParent);
+        if (this.currentFQN == null) {
+            return null;
+        }
 
         List<AdditionalAction> actions = new SmartList<>();
         GotoPypendencyOrCodeHandler self = this;
@@ -75,13 +85,12 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
             @NotNull
             @Override
             public String getText() {
-                String text = null;
-                return ObjectUtils.notNull(text, CREATE_NEW_YAML_DEFINITION);
+                return CREATE_NEW_YAML_DEFINITION;
             }
 
             @Override
             public Icon getIcon() {
-                return ObjectUtils.notNull(null, AllIcons.Actions.IntentionBulb);
+                return AllIcons.Actions.IntentionBulb;
             }
 
             @Override
@@ -94,13 +103,12 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
             @NotNull
             @Override
             public String getText() {
-                String text = null;
-                return ObjectUtils.notNull(text, CREATE_NEW_PYTHON_DEFINITION);
+                return  CREATE_NEW_PYTHON_DEFINITION;
             }
 
             @Override
             public Icon getIcon() {
-                return ObjectUtils.notNull(null, AllIcons.Actions.IntentionBulb);
+                return AllIcons.Actions.IntentionBulb;
             }
 
             @Override
@@ -112,24 +120,36 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
         return new GotoData(PsiUtilCore.getElementAtOffset(file, editor.getCaretModel().getOffset()), PsiElement.EMPTY_ARRAY, actions);
     }
 
-    private PsiFile getPypendencyDefinition(PsiFile file) {
+    private @Nullable PsiFile getPypendencyDefinition(PsiFile file) {
         VirtualFile diPath = this.getDIPath(file);
-        if (diPath == null) return null;
-        String relativePath = VfsUtilCore.getRelativePath(file.getParent().getVirtualFile(), diPath.getParent());
+        if (diPath == null) {
+            return null;
+        }
+
+        PsiDirectory fileParent = file.getParent();
+        if (fileParent == null) {
+            return null;
+        }
+
+        String relativePath = VfsUtilCore.getRelativePath(fileParent.getVirtualFile(), diPath.getParent());
         String diNewPath = diPath.getCanonicalPath() + "/" + relativePath;
         String yamlName = file.getName().replace(".py", ".yaml");
 
         String diFile = diNewPath + "/" + yamlName;
         if (FileUtil.exists(diFile)) {
+            VirtualFile fileByPath = LocalFileSystem.getInstance().findFileByPath(diFile);
+            assert fileByPath != null;
             return PsiManager.getInstance(file.getProject()).findFile(
-                    LocalFileSystem.getInstance().findFileByPath(diFile)
+                    fileByPath
             );
         }
 
         diFile = diNewPath + "/" + file.getName();
         if (FileUtil.exists(diFile)) {
+            VirtualFile fileByPath = LocalFileSystem.getInstance().findFileByPath(diFile);
+            assert fileByPath != null;
             return PsiManager.getInstance(file.getProject()).findFile(
-                    LocalFileSystem.getInstance().findFileByPath(diFile)
+                    fileByPath
             );
         }
 
@@ -173,13 +193,24 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
     private void createPypendencyPython(Editor editor, PsiFile file) {
         VirtualFile diPath = this.getDIPath(file);
 
-        if (diPath == null) return;
+        if (diPath == null) {
+            return;
+        }
 
-        String relativePath = VfsUtilCore.getRelativePath(file.getParent().getVirtualFile(), diPath.getParent());
+        Project editorProject = editor.getProject();
+        if (editorProject == null) {
+            return;
+        }
+
+        PsiDirectory fileParent = file.getParent();
+        if (fileParent == null) {
+            return;
+        }
+
+        String relativePath = VfsUtilCore.getRelativePath(fileParent.getVirtualFile(), diPath.getParent());
         String diNewPath = diPath.getCanonicalPath() + "/" + relativePath;
-
         PsiDirectory directory = WriteAction.compute(
-                () -> DirectoryUtil.mkdirs(PsiManager.getInstance(editor.getProject()), diNewPath)
+                () -> DirectoryUtil.mkdirs(PsiManager.getInstance(editorProject), diNewPath)
         );
 
         String fqn = this.currentFQN;
@@ -207,7 +238,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
         PsiFile new_file = WriteAction.compute(
                 () -> (PsiFile) directory.add(psiFile)
         );
-        FileEditorManager.getInstance(editor.getProject()).openFile(new_file.getVirtualFile(), true);
+        FileEditorManager.getInstance(editorProject).openFile(new_file.getVirtualFile(), true);
     }
 
     private @Nullable VirtualFile getDIPath(@NotNull PsiFile file) {
