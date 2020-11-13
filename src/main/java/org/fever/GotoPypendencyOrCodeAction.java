@@ -30,6 +30,5 @@ public class GotoPypendencyOrCodeAction extends PresentableActionHandlerBasedAct
     @Override
     protected LanguageExtension<CodeInsightActionHandler> getLanguageExtension() {
         return CodeInsightActions.GOTO_SUPER;
-//        return null;
     }
 }
