@@ -138,14 +138,26 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
 
     private void createPypendencyYaml(Editor editor, PsiFile file) {
         VirtualFile diPath = this.getDIPath(file);
+        if (diPath == null) {
+            return;
+        }
 
-        if (diPath == null) return;
+        Project editorProject = editor.getProject();
+        if (editorProject == null) {
+            return;
+        }
 
-        String relativePath = VfsUtilCore.getRelativePath(file.getParent().getVirtualFile(), diPath.getParent());
+        PsiDirectory fileParent = file.getParent();
+        if (fileParent == null) {
+            return;
+        }
+
+        VirtualFile parentVirtualFile = fileParent.getVirtualFile();
+        String relativePath = VfsUtilCore.getRelativePath(parentVirtualFile, diPath.getParent());
         String diNewPath = diPath.getCanonicalPath() + "/" + relativePath;
 
         PsiDirectory directory = WriteAction.compute(
-                () -> DirectoryUtil.mkdirs(PsiManager.getInstance(editor.getProject()), diNewPath)
+                () -> DirectoryUtil.mkdirs(PsiManager.getInstance(editorProject), diNewPath)
         );
 
         String fqn = this.currentFQN;
@@ -155,7 +167,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
         PsiFile new_file = WriteAction.compute(
                 () -> (PsiFile) directory.add(psiFile)
         );
-        FileEditorManager.getInstance(editor.getProject()).openFile(new_file.getVirtualFile(), true);
+        FileEditorManager.getInstance(editorProject).openFile(new_file.getVirtualFile(), true);
     }
 
     private void createPypendencyPython(Editor editor, PsiFile file) {
@@ -198,7 +210,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
         FileEditorManager.getInstance(editor.getProject()).openFile(new_file.getVirtualFile(), true);
     }
 
-    private VirtualFile getDIPath(PsiFile file) {
+    private @Nullable VirtualFile getDIPath(@NotNull PsiFile file) {
         PsiDirectory directory = file.getParent();
 
         while (directory != null) {
