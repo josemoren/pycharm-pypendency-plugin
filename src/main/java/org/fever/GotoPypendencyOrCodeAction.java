@@ -12,22 +12,22 @@ public class GotoPypendencyOrCodeAction extends PresentableActionHandlerBasedAct
     public static final String PRESENTATION_TEXT = "Pypendency";
     public static final String PRESENTATION_DESCRIPTION = "Open pypendency definition...";
 
-    AnActionEvent e;
+    AnActionEvent anActionEvent;
 
     @Override
     @NotNull
     protected CodeInsightActionHandler getHandler(){
-        return new GotoPypendencyOrCodeHandler(this.e);
+        return new GotoPypendencyOrCodeHandler(this.anActionEvent);
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        final Presentation presentation = e.getPresentation();
+    public void update(@NotNull AnActionEvent anActionEvent) {
+        final Presentation presentation = anActionEvent.getPresentation();
         presentation.setEnabledAndVisible(true);
         presentation.setText(PRESENTATION_TEXT);
         presentation.setDescription(PRESENTATION_DESCRIPTION);
-        super.update(e);
-        this.e = e;
+        super.update(anActionEvent);
+        this.anActionEvent = anActionEvent;
     }
 
     @NotNull

@@ -25,23 +25,29 @@ import javax.swing.*;
 import java.util.List;
 
 
-public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
-    AnActionEvent e;
+public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
+    public static final String FEATURE_KEY = "navigation.goto.pypendencyOrCode";
+    public static final String ACTIONS_TITLE = "Pypendency actions";
+    public static final String CREATE_NEW_YAML_DEFINITION = "Create new yaml definition...";
+    public static final String CREATE_NEW_PYTHON_DEFINITION = "Create new python definition...";
+    public static final String NOT_FOUND = "Not found";
+
+    AnActionEvent anActionEvent;
     String currentFQN = null;
 
-    public GotoPypendencyOrCodeHandler(AnActionEvent e) {
+    public GotoPypendencyOrCodeHandler(AnActionEvent anActionEvent) {
         super();
-        this.e = e;
+        this.anActionEvent = anActionEvent;
     }
 
     @Override
     protected String getFeatureUsedKey() {
-        return "navigation.goto.pypendencyOrCode";
+        return FEATURE_KEY;
     }
 
     @Override
     protected @NotNull String getChooserTitle(@NotNull PsiElement sourceElement, @Nullable String name, int length, boolean finished) {
-        return "Pypendency actions";
+        return ACTIONS_TITLE;
     }
 
     @Override
@@ -57,7 +63,7 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
         PsiFile pypendencyDefinition = this.getPypendencyDefinition(file);
 
         if (pypendencyDefinition != null) {
-            PsiElement[] targets = new PsiElement[] {pypendencyDefinition};
+            PsiElement[] targets = new PsiElement[]{pypendencyDefinition};
             return new GotoData(
                     PsiUtilCore.getElementAtOffset(file, editor.getCaretModel().getOffset()),
                     targets,
@@ -70,7 +76,7 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
             @Override
             public String getText() {
                 String text = null;
-                return ObjectUtils.notNull(text, "Create new yaml definition...");
+                return ObjectUtils.notNull(text, CREATE_NEW_YAML_DEFINITION);
             }
 
             @Override
@@ -89,7 +95,7 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
             @Override
             public String getText() {
                 String text = null;
-                return ObjectUtils.notNull(text, "Create new python definition...");
+                return ObjectUtils.notNull(text, CREATE_NEW_PYTHON_DEFINITION);
             }
 
             @Override
@@ -195,11 +201,10 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
     private VirtualFile getDIPath(PsiFile file) {
         PsiDirectory directory = file.getParent();
 
-        while(directory != null) {
+        while (directory != null) {
             String directoryPath = directory.getVirtualFile().getCanonicalPath();
 
-            if (FileUtil.exists(directoryPath + "/_dependency_injection/"))
-            {
+            if (FileUtil.exists(directoryPath + "/_dependency_injection/")) {
                 return LocalFileSystem.getInstance().findFileByPath(directoryPath + "/_dependency_injection/");
             }
 
@@ -209,10 +214,8 @@ public class GotoPypendencyOrCodeHandler  extends GotoTargetHandler {
         return null;
     }
 
-
     @Override
     protected @NotNull String getNotFoundMessage(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
-        return null;
+        return NOT_FOUND;
     }
-
 }
