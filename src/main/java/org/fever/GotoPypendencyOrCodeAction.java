@@ -9,7 +9,11 @@ import com.intellij.openapi.actionSystem.Presentation;
 import org.jetbrains.annotations.NotNull;
 
 public class GotoPypendencyOrCodeAction extends PresentableActionHandlerBasedAction {
+    public static final String PRESENTATION_TEXT = "Pypendency";
+    public static final String PRESENTATION_DESCRIPTION = "Open pypendency definition...";
+
     AnActionEvent e;
+
     @Override
     @NotNull
     protected CodeInsightActionHandler getHandler(){
@@ -20,8 +24,8 @@ public class GotoPypendencyOrCodeAction extends PresentableActionHandlerBasedAct
     public void update(@NotNull AnActionEvent e) {
         final Presentation presentation = e.getPresentation();
         presentation.setEnabledAndVisible(true);
-        presentation.setText("Pypendency");
-        presentation.setDescription("Open pypendency definition...");
+        presentation.setText(PRESENTATION_TEXT);
+        presentation.setDescription(PRESENTATION_DESCRIPTION);
         super.update(e);
         this.e = e;
     }
