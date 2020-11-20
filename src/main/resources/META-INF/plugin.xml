@@ -4,10 +4,26 @@
     <vendor email="jose.moreno@feverup.com" url="http://www.feverup.com">Fever</vendor>
 
     <description><![CDATA[
-    Add the following helpers to a project using pypendency.<br>
-    <ul>
-    <il>Navigate Pypendency</li>
-    </ul>
+    <h2>
+    Provides navigation for <a href="https://pypi.org/project/pypendency/">Pypendency</a> files.
+    </h2>
+    <br>
+
+    <p>
+    The plugin includes a <b>Pypendency</b> entry under the <b>Navigate</b> menu, and is also available as an action.<br>
+    </p>
+    <br>
+    <b>How to use it:</b><br>
+    <p>
+     The action should be triggered when the cursor is placed upon the name of the class for which we want to find the Pypendency definition file.
+    </p>
+    <p>
+    The action checks for the existence of a <i>.py</i> or <i>.yaml</i> file in a <i>_dependency_injection</i> (parent) folder with the same relative path as the current file.
+    The <i>_dependency_injection</i> folder <b>must be present</b> for the plugin to work. It must be created manually.<br>
+    If the pypendency file exists the file will be open. Otherwise, a choice will be given to create the Pypendency file.
+    The folder structure will be automatically created inside <i>_dependency_injection</i> to mimic the current file's path.
+    </p>
+
     ]]></description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
