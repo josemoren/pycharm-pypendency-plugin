@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.fever'
-version '2020.3.0'
+version '2021.1.0'
 
 repositories {
     mavenCentral()
@@ -16,11 +16,11 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2020.3'
+    version '2021.1'
     type 'PY'
     plugins 'yaml'
     pluginName 'pycharm-pypendency'
 }
 patchPluginXml {
-    changeNotes """Version 2020.3<br>Go to pypendency"""
+    changeNotes """Version 2021.1<br>Go to pypendency"""
 }
