@@ -1,26 +1,26 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.21'
+    id 'org.jetbrains.intellij' version '1.7.0'
 }
 
 group 'org.fever'
-version '2021.2.0'
+version '2022.2'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+//    testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2021.2'
-    type 'PY'
-    plugins 'yaml'
-    pluginName 'pycharm-pypendency'
+    version='2022.2'
+    type='PY'
+    plugins=['yaml']
+    pluginName='pycharm-pypendency'
 }
 patchPluginXml {
-    changeNotes """Version 2021.2<br>Go to pypendency"""
+//    changeNotes="""Version 2022.2<br>Go to pypendency."""
 }

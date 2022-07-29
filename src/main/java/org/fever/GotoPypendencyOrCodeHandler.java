@@ -79,7 +79,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
     }
 
     @NotNull
-    private GotoTargetHandler.@Nullable GotoData getGotoDataForExistingPypendency(PsiElement elementUnderCaret, PsiFile pypendencyDefinition) {
+    private GotoTargetHandler.GotoData getGotoDataForExistingPypendency(PsiElement elementUnderCaret, PsiFile pypendencyDefinition) {
         PsiElement[] targets = new PsiElement[]{pypendencyDefinition};
         return new GotoData(
                 elementUnderCaret,
@@ -89,7 +89,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
     }
 
     @NotNull
-    private GotoTargetHandler.@Nullable GotoData getGotoDataForNewPypendency(Editor editor, PsiFile file, PsiElement elementUnderCaret, GotoPypendencyOrCodeHandler self) {
+    private GotoTargetHandler.GotoData getGotoDataForNewPypendency(Editor editor, PsiFile file, PsiElement elementUnderCaret, GotoPypendencyOrCodeHandler self) {
         List<AdditionalAction> actions = new SmartList<>();
         actions.add(new AdditionalAction() {
             @NotNull
