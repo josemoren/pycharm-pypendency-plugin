@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '1.10.1'
+    id 'org.jetbrains.intellij' version '1.13.3'
 }
 
 group 'org.fever'
@@ -8,10 +8,17 @@ version '2023.1'
 
 repositories {
     mavenCentral()
+//    maven { url "https://plugins.jetbrains.com/maven" }
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+    gradlePluginPortal()
 }
 
 dependencies {
 //    testCompile group: 'junit', name: 'junit', version: '4.12'
+//    implementation "com.intellij:platform-impl:2023.1"
+//    implementation "com.jetbrains.intellij.pycharm:BUILD:2023.1"
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/

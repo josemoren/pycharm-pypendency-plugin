@@ -32,9 +32,9 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
 
-<!--    <extensions defaultExtensionNs="com.intellij">-->
-<!--        <completion.contributor language="yaml" implementationClass="org.fever.YamlCompletionContributor"/>-->
-<!--    </extensions>-->
+    <extensions defaultExtensionNs="com.intellij">
+        <completion.contributor language="yaml" implementationClass="org.fever.YamlCompletionContributor"/>
+    </extensions>
 
     <actions>
         <action id="GotoPypendency" class="org.fever.GotoPypendencyOrCodeAction" description="Pypendency" popup="true" text="Pypendency">
