@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 public class PsiReference extends PsiReferenceBase<PsiElement> {
+    private static final String[] DI_FILE_EXTENSIONS = { ".yaml", ".py", ".yml" };
 
     private final String fqn;
 
@@ -51,19 +52,28 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
     }
 
     private @Nullable PsiElement resolveToFqnsDependencyInjectionFile(String fqn, PsiManager psiManager) {
-        String absoluteDependencyInjectionFilePath = this.getAbsoluteDependencyInjectionFilePath(fqn);
-        return SourceCodeFileResolver.getFileFromAbsolutePath(absoluteDependencyInjectionFilePath, psiManager);
+        String diFilePathWithoutExtension = getAbsoluteDependencyInjectionFilePathWithoutExtension(fqn);
+
+        for (String extension : DI_FILE_EXTENSIONS) {
+            String absoluteDependencyInjectionFilePath = diFilePathWithoutExtension + extension;
+            PsiFile file = SourceCodeFileResolver.getFileFromAbsolutePath(absoluteDependencyInjectionFilePath, psiManager);
+            if (file != null) {
+                return file;
+            }
+        }
+        return null;
     }
 
-    private String getAbsoluteDependencyInjectionFilePath(String fqn) {
+    private String getAbsoluteDependencyInjectionFilePathWithoutExtension(String fqn) {
         // Input: core.infrastructure.user.finders.core_user_finder.CoreUserFinder
-        // Output: core/_dependency_injection/infrastructure/user/finders/core_user_finder.py
+        // Output: core/_dependency_injection/infrastructure/user/finders/core_user_finder
 
-        String projectPath = getElement().getProject().getBasePath();
+        String absoluteBasePath = getElement().getProject().getBasePath();
         String[] parts = fqn.split("\\.");
         String djangoAppName = parts[0];
         String relativeFilePath = String.join("/", Arrays.copyOfRange(parts, 1, parts.length - 1));
-        return projectPath + "/src/" + djangoAppName + GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER + relativeFilePath + ".py";
+
+        return absoluteBasePath + "/src/" + djangoAppName + GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER + relativeFilePath;
     }
 
     @Override
