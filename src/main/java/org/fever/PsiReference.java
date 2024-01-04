@@ -10,8 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 public class PsiReference extends PsiReferenceBase<PsiElement> {
-    private static final String[] DI_FILE_EXTENSIONS = { ".yaml", ".py", ".yml" };
-
     private final String fqn;
 
     public PsiReference(@NotNull PsiElement element, TextRange textRange, String fqn) {
@@ -27,12 +25,16 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
     @Override
     public @Nullable PsiElement resolve() {
         PsiManager psiManager = getElement().getManager();
-        PsiElement sourceCodeFile = SourceCodeFileResolver.fromFqn(fqn, psiManager);
-        if (sourceCodeFile == null && this.fqnMatchesFileName(fqn)) {
+        PsiElement sourceCodeFile = null;
+
+        if (this.fqnMatchesFileName(fqn)) {
             sourceCodeFile = resolveSourceCodeFileFromCurrentDependencyInjectionFile(psiManager);
         }
         if (sourceCodeFile == null) {
             sourceCodeFile = resolveToFqnsDependencyInjectionFile(fqn, psiManager);
+        }
+        if (sourceCodeFile == null) {
+            sourceCodeFile = SourceCodeFileResolver.fromFqn(fqn, psiManager);
         }
 
         return sourceCodeFile;
@@ -54,9 +56,17 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
     private @Nullable PsiElement resolveToFqnsDependencyInjectionFile(String fqn, PsiManager psiManager) {
         String diFilePathWithoutExtension = getAbsoluteDependencyInjectionFilePathWithoutExtension(fqn);
 
-        for (String extension : DI_FILE_EXTENSIONS) {
-            String absoluteDependencyInjectionFilePath = diFilePathWithoutExtension + extension;
-            PsiFile file = SourceCodeFileResolver.getFileFromAbsolutePath(absoluteDependencyInjectionFilePath, psiManager);
+        String[] possibleFilePathsOrderedByMostCommon = {
+                diFilePathWithoutExtension + "/" + SourceCodeFileResolver.getClassNameInSnakeCase(fqn) + ".yaml",
+                diFilePathWithoutExtension + "/" + SourceCodeFileResolver.getClassNameInSnakeCase(fqn) + ".py",
+                diFilePathWithoutExtension + ".yaml",
+                diFilePathWithoutExtension + ".py",
+                diFilePathWithoutExtension + "/" + SourceCodeFileResolver.getClassNameInSnakeCase(fqn) + ".yml",
+                diFilePathWithoutExtension + ".yml",
+        };
+
+        for (String filePath : possibleFilePathsOrderedByMostCommon) {
+            PsiFile file = SourceCodeFileResolver.getFileFromAbsolutePath(filePath, psiManager);
             if (file != null) {
                 return file;
             }
