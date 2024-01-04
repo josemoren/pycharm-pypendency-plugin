@@ -37,9 +37,15 @@
 <!--    </extensions>-->
 
     <actions>
-        <action id="GotoPypendency" class="org.fever.GotoPypendencyOrCodeAction" description="Pypendency" popup="true" text="Pypendency">
+        <group id="PypendencyGroup" popup="true" text="Pypendency">
             <add-to-group group-id="GoToCodeGroup" anchor="after" relative-to-action="GotoTest"/>
-            <add-to-group group-id="EditorPopupMenu.GoTo"/>
-        </action>
+            <action id="GotoPypendency" class="org.fever.GotoPypendencyOrCodeAction" text="Pypendency: Go to/Create DI File" popup="true">
+                <add-to-group group-id="PypendencyGroup" anchor="first"/>
+                <add-to-group group-id="EditorPopupMenu.GoTo"/>
+            </action>
+            <action id="GotoCodeFromPypendency" class="org.fever.GotoCodeAction" text="Pypendency: Go to Code">
+                <add-to-group group-id="PypendencyGroup" anchor="after" relative-to-action="GotoPypendency"/>
+            </action>
+        </group>
     </actions>
 </idea-plugin>

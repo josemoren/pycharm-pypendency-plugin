@@ -6,18 +6,33 @@ import com.intellij.lang.CodeInsightActions;
 import com.intellij.lang.LanguageExtension;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
+import static org.fever.GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER;
+
 public class GotoPypendencyOrCodeAction extends PresentableActionHandlerBasedAction {
-    public static final String PRESENTATION_TEXT = "Pypendency";
-    public static final String PRESENTATION_DESCRIPTION = "Open pypendency definition...";
+    public static final String PRESENTATION_TEXT = "Pypendency: Go to/create DI file";
+    public static final String PRESENTATION_DESCRIPTION = "Open or create pypendency definition...";
 
     AnActionEvent anActionEvent;
 
     @Override
     @NotNull
     protected CodeInsightActionHandler getHandler(){
-        return new GotoPypendencyOrCodeHandler(this.anActionEvent);
+        PsiFile file = (PsiFile) this.anActionEvent.getDataContext().getData("psi.File");
+        assert file != null;
+        if (isDependencyInjectionFile(file)) {
+            return new GotoCodeHandler(this.anActionEvent);
+        } else {
+            return new GotoPypendencyOrCodeHandler(this.anActionEvent);
+        }
+    }
+
+    private Boolean isDependencyInjectionFile(PsiFile file) {
+        String filePath = file.getVirtualFile().getCanonicalPath();
+        assert filePath != null;
+        return filePath.contains(DEPENDENCY_INJECTION_FOLDER);
     }
 
     @Override
