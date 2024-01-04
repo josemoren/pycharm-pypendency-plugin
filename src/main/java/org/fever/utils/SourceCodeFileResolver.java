@@ -4,6 +4,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import org.fever.GotoPypendencyOrCodeHandler;
 import org.jetbrains.annotations.Nullable;
 
 public class SourceCodeFileResolver {
@@ -30,6 +31,22 @@ public class SourceCodeFileResolver {
         String[] parts = fqn.split("\\.");
         String className = parts[parts.length - 1];
         return CaseFormatter.camelCaseToSnakeCase(className);
+    }
+
+    public static @Nullable PsiFile fromDependencyInjectionFilePath(String absoluteDependencyInjectionFilePath, PsiManager psiManager) {
+        if (!fileIsInDependencyInjectionFolder(absoluteDependencyInjectionFilePath)) {
+            return null;
+        }
+
+        String sourceCodeFilePath = absoluteDependencyInjectionFilePath
+                .replace(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER, "/")
+                .replaceAll("\\.y(a)?ml", ".py");
+
+        return getFileFromAbsolutePath(sourceCodeFilePath, psiManager);
+    }
+
+    private static Boolean fileIsInDependencyInjectionFolder(String filePath) {
+        return filePath.contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER);
     }
 
     public static @Nullable PsiFile getFileFromAbsolutePath(String absolutePath, PsiManager psiManager) {
