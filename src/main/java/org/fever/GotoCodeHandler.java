@@ -28,7 +28,6 @@ public class GotoCodeHandler extends GotoTargetHandler {
         return FEATURE_KEY;
     }
 
-
     @Override
     @Nullable
     protected GotoData getSourceAndTargetElements(Editor editor, PsiFile dependencyInjectionFile) {
