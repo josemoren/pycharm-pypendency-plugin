@@ -8,21 +8,20 @@ import org.fever.utils.FqnExtractor;
 import org.jetbrains.annotations.NotNull;
 
 public class ReferenceProvider extends PsiReferenceProvider {
-
     @Override
     public com.intellij.psi.PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
         String text = element.getText();
         if (!text.matches(FqnExtractor.FQN_REGEX)) {
-            return new com.intellij.psi.PsiReference[0];
+            return org.fever.PsiReference.EMPTY_ARRAY;
         }
 
-        com.intellij.psi.PsiReference reference = getReferenceForFqn(element, text);
+        org.fever.PsiReference reference = getReferenceForFqn(element, text);
 
-        return new com.intellij.psi.PsiReference[]{reference};
+        return new org.fever.PsiReference[]{reference};
     }
 
     @NotNull
-    private static com.intellij.psi.PsiReference getReferenceForFqn(@NotNull PsiElement element, String fqn) {
+    private static org.fever.PsiReference getReferenceForFqn(@NotNull PsiElement element, String fqn) {
         TextRange range;
         if (hasQuotes(fqn)) {
              range = new TextRange(1, fqn.length() - 1);
@@ -30,7 +29,7 @@ public class ReferenceProvider extends PsiReferenceProvider {
             range = new TextRange(0, fqn.length());
         }
 
-        return new PsiReference(element, range, fqn);
+        return new org.fever.PsiReference(element, range, fqn);
     }
 
     private static boolean hasQuotes(String fqn) {
