@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FqnExtractor {
-    public static final String FQN_REGEX = "^\"?@?[a-z0-9_.]+\\.[A-Z]+[a-zA-Z]+\"?$";
+    public static final String FQN_REGEX = "^\"?@?[a-z0-9_.]+\\.[A-Za-z0-9_]+\"?$";
     private static final String YAML_FQN_GROUP_SELECTOR_REGEX = "fqn:\\s*(\\S+)";
     private static final String PYTHON_FQN_GROUP_SELECTOR_REGEX = "container_builder\\.set_definition\\(\\s+Definition\\(\\s*\"\\S+\",\\s*\"(\\S+)\"";
 
