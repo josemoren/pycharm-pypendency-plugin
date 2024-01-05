@@ -25,19 +25,19 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
     @Override
     public @Nullable PsiElement resolve() {
         PsiManager psiManager = getElement().getManager();
-        PsiElement sourceCodeFile = null;
+        PsiElement file = null;
 
         if (this.fqnMatchesFileName(fqn)) {
-            sourceCodeFile = resolveSourceCodeFileFromCurrentDependencyInjectionFile(psiManager);
+            file = resolveSourceCodeFileFromCurrentDependencyInjectionFile(psiManager);
         }
-        if (sourceCodeFile == null) {
-            sourceCodeFile = resolveToFqnsDependencyInjectionFile(fqn, psiManager);
+        if (file == null) {
+            file = resolveToFqnsDependencyInjectionFile(fqn, psiManager);
         }
-        if (sourceCodeFile == null) {
-            sourceCodeFile = SourceCodeFileResolver.fromFqn(fqn, psiManager);
+        if (file == null) {
+            file = SourceCodeFileResolver.fromFqn(fqn, psiManager);
         }
 
-        return sourceCodeFile;
+        return file;
     }
 
     private boolean fqnMatchesFileName(String fqn) {
