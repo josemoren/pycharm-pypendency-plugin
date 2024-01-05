@@ -225,7 +225,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
                 "from django.conf import settings\n" +
                 "\n" +
                 "\n" +
-                "def load(container_builder: ContainerBuilder):\n" +
+                "def load(container_builder: ContainerBuilder) -> None:\n" +
                 "    container_builder.set_definition(\n" +
                 "        Definition(\n" +
                 "            \"" + fqn + "\",\n" +
