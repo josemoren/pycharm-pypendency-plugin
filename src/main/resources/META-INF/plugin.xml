@@ -30,6 +30,7 @@
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.python</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
 
 <!--    <extensions defaultExtensionNs="com.intellij">-->
@@ -38,7 +39,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <psi.referenceContributor language="yaml" implementation="org.fever.YamlReferenceContributor"/>
-        <psi.referenceContributor implementation="org.fever.PythonReferenceContributor"/>
+        <psi.referenceContributor language="Python" implementation="org.fever.PythonReferenceContributor"/>
     </extensions>
 
     <actions>
