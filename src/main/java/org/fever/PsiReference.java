@@ -17,8 +17,10 @@ import java.util.regex.Pattern;
 
 public class PsiReference extends PsiReferenceBase<PsiElement> {
     private final String identifier;
-    private static final String MANUALLY_SET_FQN_GROUP_SELECTOR_REGEX = "container_builder\\.set\\(\\s*\"(\\S+)\"";
-
+    private static final String[] REGEX_FOR_MANUALLY_SET_IDENTIFIERS = {
+            "container_builder\\.set\\(\\s*\"(\\S+)\"",
+            "container_builder\\.set_definition\\(\\s*Definition\\(\\s*\"(\\S+)\"",
+    };
     public PsiReference(@NotNull PsiElement element, TextRange textRange, String identifier) {
         super(element, textRange);
 
@@ -96,9 +98,11 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
             PsiFile psiFile = psiManager.findFile(file);
             assert psiFile != null;
             String fileContent = psiFile.getText();
-            Matcher matcher = Pattern.compile(MANUALLY_SET_FQN_GROUP_SELECTOR_REGEX).matcher(fileContent);
-            if (matcher.find() && matcher.group(1).equals(identifier)) {
-                return psiFile;
+            for (String regex : REGEX_FOR_MANUALLY_SET_IDENTIFIERS) {
+                Matcher matcher = Pattern.compile(regex).matcher(fileContent);
+                if (matcher.find() && matcher.group(1).equals(identifier)) {
+                    return psiFile;
+                }
             }
         }
         return null;
