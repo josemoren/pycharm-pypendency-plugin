@@ -108,12 +108,13 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
                         PythonFileType.INSTANCE,
                         scope);
 
-        for (VirtualFile file : dependencyInjectionFiles) {
-            PsiFile psiFile = psiManager.findFile(file);
-            assert psiFile != null;
-            String fileContent = psiFile.getText();
-            for (String regex : MANUALLY_SET_FQN_GROUP_SELECTOR_REGEXPS) {
-                Matcher matcher = Pattern.compile(regex).matcher(fileContent);
+        for (String regex : MANUALLY_SET_FQN_GROUP_SELECTOR_REGEXPS) {
+            Matcher matcher = Pattern.compile(regex).matcher("");
+            for (VirtualFile file : dependencyInjectionFiles) {
+                PsiFile psiFile = psiManager.findFile(file);
+                assert psiFile != null;
+                String fileContent = psiFile.getText();
+                matcher.reset(fileContent);
                 if (matcher.find() && matcher.group(1).equals(fqn)) {
                     return psiFile;
                 }
