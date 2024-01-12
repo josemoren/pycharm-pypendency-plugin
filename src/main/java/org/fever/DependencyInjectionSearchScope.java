@@ -13,7 +13,7 @@ public class DependencyInjectionSearchScope extends GlobalSearchScope {
 
     @Override
     public boolean contains(@NotNull VirtualFile file) {
-        return file.getPath().contains("/_dependency_injection") && file.getName().endsWith(".py");
+        return file.getPath().contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER) && file.getName().endsWith(".py");
     }
 
     @Override
