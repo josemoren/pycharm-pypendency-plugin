@@ -9,40 +9,41 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 public class PsiReference extends PsiReferenceBase<PsiElement> {
-    private final String fqn;
+    private final String identifier;
 
-    public PsiReference(@NotNull PsiElement element, TextRange textRange, String fqn) {
+    public PsiReference(@NotNull PsiElement element, TextRange textRange, String identifier) {
         super(element, textRange);
 
-        this.fqn = this.cleanFqn(fqn);
+        this.identifier = this.cleanIdentifier(identifier);
     }
 
-    private String cleanFqn(String fqn) {
-        return fqn.replaceAll("[\"'@]", "");
+    private String cleanIdentifier(String identifier) {
+        return identifier.replaceAll("[\"'@]", "");
     }
 
     @Override
     public @Nullable PsiElement resolve() {
         PsiManager psiManager = getElement().getManager();
-        PsiElement file = resolveToFqnsDependencyInjectionFile(fqn, psiManager);
+        PsiElement file = resolveToDependencyInjectionFileFromIdentifier(identifier, psiManager);
 
         if (file == null) {
-            file = SourceCodeFileResolver.fromFqn(fqn, psiManager);
+            file = tryFallingBackToSourceCodeFileUsingIdentifierAsFqn(identifier, psiManager);
         }
 
         return file;
     }
 
-    private @Nullable PsiElement resolveToFqnsDependencyInjectionFile(String fqn, PsiManager psiManager) {
-        String diFilePathWithoutExtension = getAbsoluteDependencyInjectionFilePathWithoutExtension(fqn);
+    private @Nullable PsiElement resolveToDependencyInjectionFileFromIdentifier(String identifier, PsiManager psiManager) {
+        String diFileDirectory = getAbsoluteDependencyInjectionFileDirectory(identifier);
+        String diFileName = SourceCodeFileResolver.getClassNameInSnakeCase(identifier);
 
         String[] possibleFilePathsOrderedByMostCommon = {
-                diFilePathWithoutExtension + "/" + SourceCodeFileResolver.getClassNameInSnakeCase(fqn) + ".yaml",
-                diFilePathWithoutExtension + "/" + SourceCodeFileResolver.getClassNameInSnakeCase(fqn) + ".py",
-                diFilePathWithoutExtension + ".yaml",
-                diFilePathWithoutExtension + ".py",
-                diFilePathWithoutExtension + "/" + SourceCodeFileResolver.getClassNameInSnakeCase(fqn) + ".yml",
-                diFilePathWithoutExtension + ".yml",
+                diFileDirectory + "/" + diFileName + ".yaml",
+                diFileDirectory + "/" + diFileName + ".py",
+                diFileDirectory + ".yaml",
+                diFileDirectory + ".py",
+                diFileDirectory + "/" + diFileName + ".yml",
+                diFileDirectory + ".yml",
         };
 
         for (String filePath : possibleFilePathsOrderedByMostCommon) {
@@ -57,22 +58,27 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
     /**
      * Gets the absolute file path of the DI file without the file extension.
      * For example:
-     *     fqn: core.infrastructure.user.finders.core_user_finder.CoreUserFinder
-     *     return: <PROJECT_PATH>/src/core/_dependency_injection/infrastructure/user/finders/core_user_finder
-     * @param fqn full qualified name of the class.
+     * identifier: core.infrastructure.user.finders.core_user_finder.CoreUserFinder
+     * return: <PROJECT_PATH>/src/core/_dependency_injection/infrastructure/user/finders/core_user_finder
+     *
+     * @param identifier full qualified name of the class.
      * @return string with the full path of the DI file without the file extension.
      */
-    private String getAbsoluteDependencyInjectionFilePathWithoutExtension(String fqn) {
+    private String getAbsoluteDependencyInjectionFileDirectory(String identifier) {
         String absoluteBasePath = getElement().getProject().getBasePath();
-        String[] parts = fqn.split("\\.");
+        String[] parts = identifier.split("\\.");
         String djangoAppName = parts[0];
         String relativeFilePath = String.join("/", Arrays.copyOfRange(parts, 1, parts.length - 1));
 
         return absoluteBasePath + "/src/" + djangoAppName + GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER + relativeFilePath;
     }
 
+    public static @Nullable PsiFile tryFallingBackToSourceCodeFileUsingIdentifierAsFqn(String identifier, PsiManager psiManager) {
+        return SourceCodeFileResolver.fromFqn(identifier, psiManager);
+    }
+
     @Override
     public @NotNull String getCanonicalText() {
-        return fqn;
+        return identifier;
     }
 }
