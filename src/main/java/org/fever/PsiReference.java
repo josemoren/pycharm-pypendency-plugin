@@ -21,6 +21,7 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
             "container_builder\\.set\\(\\s*\"(\\S+)\"",
             "container_builder\\.set_definition\\(\\s*Definition\\(\\s*\"(\\S+)\"",
     };
+
     public PsiReference(@NotNull PsiElement element, TextRange textRange, String identifier) {
         super(element, textRange);
 
@@ -80,13 +81,16 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
     private String getAbsoluteDependencyInjectionFileDirectory(String identifier) {
         String absoluteBasePath = getElement().getProject().getBasePath();
         String[] parts = identifier.split("\\.");
-        if (parts.length < 2) {
-            return "";
-        }
         String djangoAppName = parts[0];
-        String relativeFilePath = String.join("/", Arrays.copyOfRange(parts, 1, parts.length - 1));
+        String relativeFilePath = getRelativeFilePath(identifier, parts);
+        return absoluteBasePath + "/src/" + djangoAppName + GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER + "/" + relativeFilePath;
+    }
 
-        return absoluteBasePath + "/src/" + djangoAppName + GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER + relativeFilePath;
+    private static String getRelativeFilePath(String identifier, String[] parts) {
+        if (parts.length < 2) {
+            return String.join("/", Arrays.copyOfRange(parts, 1, parts.length - 1));
+        }
+        return identifier;
     }
 
     private PsiElement resolveToDependencyInjectionManualDeclaration(String identifier, PsiManager psiManager) {
