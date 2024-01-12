@@ -10,7 +10,7 @@ public class YamlReferenceContributor extends PsiReferenceContributor {
                 PlatformPatterns.psiElement()
                 .inFile(PlatformPatterns.psiFile()
                 ),
-                new ReferenceProvider()
+                new YamlReferenceProvider()
         );
     }
 }
