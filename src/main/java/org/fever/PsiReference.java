@@ -35,7 +35,8 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
 
     @Override
     public @Nullable PsiElement resolve() {
-        PsiManager psiManager = getElement().getManager();
+        PsiElement thisElement = getElement();
+        PsiManager psiManager = thisElement.getManager();
         PsiElement file = null;
 
         if (this.fqnMatchesFileName(fqn)) {
@@ -49,6 +50,9 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
         }
         if (file == null) {
             file = SourceCodeFileResolver.fromFqn(fqn, psiManager);
+        }
+        if (file == null) {
+            file = thisElement.getContainingFile();
         }
 
         return file;
