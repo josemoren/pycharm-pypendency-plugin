@@ -4,7 +4,6 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import org.fever.GotoPypendencyOrCodeHandler;
 import org.jetbrains.annotations.Nullable;
 
 public class SourceCodeFileResolver {
