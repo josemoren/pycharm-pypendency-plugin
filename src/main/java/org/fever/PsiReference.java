@@ -80,6 +80,9 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
     private String getAbsoluteDependencyInjectionFileDirectory(String identifier) {
         String absoluteBasePath = getElement().getProject().getBasePath();
         String[] parts = identifier.split("\\.");
+        if (parts.length < 2) {
+            return "";
+        }
         String djangoAppName = parts[0];
         String relativeFilePath = String.join("/", Arrays.copyOfRange(parts, 1, parts.length - 1));
 
