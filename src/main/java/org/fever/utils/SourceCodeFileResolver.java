@@ -26,7 +26,7 @@ public class SourceCodeFileResolver {
         return null;
     }
 
-    private static String getClassNameInSnakeCase(String fqn) {
+    public static String getClassNameInSnakeCase(String fqn) {
         String[] parts = fqn.split("\\.");
         String className = parts[parts.length - 1];
         return CaseFormatter.camelCaseToSnakeCase(className);

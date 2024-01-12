@@ -18,8 +18,9 @@ dependencies {
 intellij {
     version='2023.3'
     type='PY'
-    plugins=['yaml']
+    plugins=['yaml', 'Pythonid']
     pluginName='pycharm-pypendency'
+    downloadSources=false
 }
 patchPluginXml {
     changeNotes="Version 2023.3<br>Go to pypendency."
