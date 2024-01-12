@@ -2,7 +2,6 @@ package org.fever;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
-import org.fever.utils.CaseFormatter;
 import org.fever.utils.SourceCodeFileResolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
