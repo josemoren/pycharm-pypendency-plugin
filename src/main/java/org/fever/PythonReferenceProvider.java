@@ -1,5 +1,6 @@
 package org.fever;
 
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.QualifiedName;
 import com.intellij.util.ProcessingContext;
@@ -16,7 +17,7 @@ public class PythonReferenceProvider extends ReferenceProvider {
         String text = cleanText(element.getText());
 
         if (isInDependencyInjectionFile(element)) {
-            if (hasIdentifierFormat(text)) {
+            if (text.matches(IDENTIFIER_REGEX_FOR_DI_FILES)) {
                 return getReferenceForIdentifierAsArray(element, text);
             }
         } else if (isInContainerBuilderGet(element)) {
@@ -25,12 +26,12 @@ public class PythonReferenceProvider extends ReferenceProvider {
         return PsiReference.EMPTY_ARRAY;
     }
 
-    private static boolean hasIdentifierFormat(String text) {
-        return text.startsWith("@") && text.contains(".");
-    }
-
     private static boolean isInDependencyInjectionFile(@NotNull PsiElement element) {
-        String absoluteFilePath = element.getContainingFile().getVirtualFile().getCanonicalPath();
+        VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
+        if (virtualFile == null) {
+            return false;
+        }
+        String absoluteFilePath = virtualFile.getCanonicalPath();
         if (absoluteFilePath == null) {
             return false;
         }
