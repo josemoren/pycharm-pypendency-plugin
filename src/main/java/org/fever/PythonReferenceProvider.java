@@ -12,6 +12,8 @@ import static org.fever.GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER;
 
 
 public class PythonReferenceProvider extends ReferenceProvider {
+    private static final String IDENTIFIER_REGEX_FOR_CONTAINER_BUILDER_GET = "^[a-z0-9_.]+\\.[A-Za-z0-9_]+$";
+
     @Override
     public com.intellij.psi.PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
         String text = cleanText(element.getText());
@@ -21,7 +23,9 @@ public class PythonReferenceProvider extends ReferenceProvider {
                 return getReferenceForIdentifierAsArray(element, text);
             }
         } else if (isInContainerBuilderGet(element)) {
-            return getReferenceForIdentifierAsArray(element, text);
+            if (text.matches(IDENTIFIER_REGEX_FOR_CONTAINER_BUILDER_GET)) {
+                return getReferenceForIdentifierAsArray(element, text);
+            }
         }
         return PsiReference.EMPTY_ARRAY;
     }
