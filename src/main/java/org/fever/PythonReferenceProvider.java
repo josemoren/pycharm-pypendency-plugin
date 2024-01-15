@@ -1,5 +1,6 @@
 package org.fever;
 
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.QualifiedName;
 import com.intellij.util.ProcessingContext;
@@ -11,22 +12,30 @@ import static org.fever.GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER;
 
 
 public class PythonReferenceProvider extends ReferenceProvider {
+    private static final String IDENTIFIER_REGEX_FOR_CONTAINER_BUILDER_GET = "^[a-z0-9_.]+\\.[A-Za-z0-9_]+$";
+
     @Override
     public com.intellij.psi.PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
         String text = cleanText(element.getText());
 
         if (isInDependencyInjectionFile(element)) {
-            if (text.startsWith("@")) {
+            if (text.matches(IDENTIFIER_REGEX_FOR_DI_FILES)) {
                 return getReferenceForIdentifierAsArray(element, text);
             }
         } else if (isInContainerBuilderGet(element)) {
-            return getReferenceForIdentifierAsArray(element, text);
+            if (text.matches(IDENTIFIER_REGEX_FOR_CONTAINER_BUILDER_GET)) {
+                return getReferenceForIdentifierAsArray(element, text);
+            }
         }
         return PsiReference.EMPTY_ARRAY;
     }
 
     private static boolean isInDependencyInjectionFile(@NotNull PsiElement element) {
-        String absoluteFilePath = element.getContainingFile().getVirtualFile().getCanonicalPath();
+        VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
+        if (virtualFile == null) {
+            return false;
+        }
+        String absoluteFilePath = virtualFile.getCanonicalPath();
         if (absoluteFilePath == null) {
             return false;
         }

@@ -13,7 +13,20 @@ public class DependencyInjectionSearchScope extends GlobalSearchScope {
 
     @Override
     public boolean contains(@NotNull VirtualFile file) {
-        return file.getPath().contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER) && file.getName().endsWith(".py");
+        String filePath = file.getPath();
+        return isPythonFile(file) && fileIsInDependencyInjectionFolder(filePath) && fileIsNotInExternalLibraries(filePath);
+    }
+
+    private static boolean fileIsInDependencyInjectionFolder(String filePath) {
+        return filePath.contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER);
+    }
+
+    private static boolean isPythonFile(@NotNull VirtualFile file) {
+        return file.getName().endsWith(".py");
+    }
+
+    private static boolean fileIsNotInExternalLibraries(String filePath) {
+        return !filePath.contains("/remote_sources/");
     }
 
     @Override
@@ -23,7 +36,7 @@ public class DependencyInjectionSearchScope extends GlobalSearchScope {
 
     @Override
     public boolean isSearchInModuleContent(@NotNull com.intellij.openapi.module.Module aModule) {
-        return true;
+        return false;
     }
 
     @Override
