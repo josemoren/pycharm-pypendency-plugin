@@ -16,13 +16,17 @@ public class PythonReferenceProvider extends ReferenceProvider {
         String text = cleanText(element.getText());
 
         if (isInDependencyInjectionFile(element)) {
-            if (text.startsWith("@")) {
+            if (hasIdentifierFormat(text)) {
                 return getReferenceForIdentifierAsArray(element, text);
             }
         } else if (isInContainerBuilderGet(element)) {
             return getReferenceForIdentifierAsArray(element, text);
         }
         return PsiReference.EMPTY_ARRAY;
+    }
+
+    private static boolean hasIdentifierFormat(String text) {
+        return text.startsWith("@") && text.contains(".");
     }
 
     private static boolean isInDependencyInjectionFile(@NotNull PsiElement element) {

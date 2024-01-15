@@ -8,9 +8,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class SourceCodeFileResolver {
     public static @Nullable PsiFile fromFqn(String fqn, PsiManager psiManager) {
-        if (!fqnHasDots(fqn)) {
-            return null;
-        }
         String fqnWithSlashes = fqn.replace(".", "/");
         String relativeFilePath = fqnWithSlashes.substring(0, fqnWithSlashes.lastIndexOf("/"));
         String absoluteBasePath = psiManager.getProject().getBasePath();
@@ -27,10 +24,6 @@ public class SourceCodeFileResolver {
             }
         }
         return null;
-    }
-
-    private static boolean fqnHasDots(String fqn) {
-        return fqn.contains(".");
     }
 
     public static String getClassNameInSnakeCase(String fqn) {
