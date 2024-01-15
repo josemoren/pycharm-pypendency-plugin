@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 public class PsiReference extends PsiReferenceBase<PsiElement> {
     private final String identifier;
     private static final String[] REGEX_FOR_MANUALLY_SET_IDENTIFIERS = {
-            "container_builder\\.set\\(\\s*\"(\\S+)\"",
+            "container(?:_builder)?\\.set\\(\\s*\"(\\S+)\"",
             "container_builder\\.set_definition\\(\\s*Definition\\(\\s*\"(\\S+)\"",
     };
 
@@ -82,15 +82,9 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
         String absoluteBasePath = getElement().getProject().getBasePath();
         String[] parts = identifier.split("\\.");
         String djangoAppName = parts[0];
-        String relativeFilePath = getRelativeFilePath(identifier, parts);
-        return absoluteBasePath + "/src/" + djangoAppName + GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER + "/" + relativeFilePath;
-    }
+        String relativeFilePath = String.join("/", Arrays.copyOfRange(parts, 1, parts.length - 1));
 
-    private static String getRelativeFilePath(String identifier, String[] parts) {
-        if (parts.length < 2) {
-            return String.join("/", Arrays.copyOfRange(parts, 1, parts.length - 1));
-        }
-        return identifier;
+        return absoluteBasePath + "/src/" + djangoAppName + GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER + relativeFilePath;
     }
 
     private PsiElement resolveToDependencyInjectionManualDeclaration(String identifier, PsiManager psiManager) {
