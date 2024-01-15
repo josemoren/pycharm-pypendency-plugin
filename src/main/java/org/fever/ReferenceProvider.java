@@ -14,8 +14,7 @@ public abstract class ReferenceProvider extends PsiReferenceProvider {
     @NotNull
     protected static org.fever.PsiReference getReferenceForIdentifier(@NotNull PsiElement element, String identifier) {
         TextRange range;
-        int offset = element.getText().contains("@") ? 1 : 0;
-        range = new TextRange(offset, identifier.length() + offset);
+        range = new TextRange(1, identifier.length() + 1);
         return new org.fever.PsiReference(element, range, identifier);
     }
 }
