@@ -1,5 +1,6 @@
 package org.fever;
 
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.QualifiedName;
 import com.intellij.util.ProcessingContext;
@@ -26,7 +27,11 @@ public class PythonReferenceProvider extends ReferenceProvider {
     }
 
     private static boolean isInDependencyInjectionFile(@NotNull PsiElement element) {
-        String absoluteFilePath = element.getContainingFile().getVirtualFile().getCanonicalPath();
+        VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
+        if (virtualFile == null) {
+            return false;
+        }
+        String absoluteFilePath = virtualFile.getCanonicalPath();
         if (absoluteFilePath == null) {
             return false;
         }
