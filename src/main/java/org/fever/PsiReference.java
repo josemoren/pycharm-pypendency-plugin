@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 public class PsiReference extends PsiReferenceBase<PsiElement> {
     private final String identifier;
     private static final String[] REGEX_FOR_MANUALLY_SET_IDENTIFIERS = {
-            "container_builder\\.set\\(\\s*\"(\\S+)\"",
+            "container(?:_builder)?\\.set\\(\\s*\"(\\S+)\"",
             "container_builder\\.set_definition\\(\\s*Definition\\(\\s*\"(\\S+)\"",
     };
     private final ResolutionCache.State resolutionCache;
