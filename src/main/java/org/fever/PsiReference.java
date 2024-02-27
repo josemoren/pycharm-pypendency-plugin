@@ -1,6 +1,6 @@
 package org.fever;
 
-import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
@@ -29,7 +29,7 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
         super(element, textRange);
 
         this.identifier = this.cleanIdentifier(identifier);
-        this.resolutionCache = ServiceManager.getService(ResolutionCache.class).getState();
+        this.resolutionCache = ApplicationManager.getApplication().getService(ResolutionCache.class).getState();
         this.projectName = element.getProject().getName();
     }
 
@@ -45,26 +45,26 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
         if (dependencyInjectionFile != null) {
             return dependencyInjectionFile;
         }
-        return resolveManuallyAndCache(psiManager);
+        return resolveManuallyAndStoreInCache(psiManager);
     }
 
     private PsiFile resolveFromCache(PsiManager psiManager) {
-        String filePath = resolutionCache.getCachedResolution(projectName, identifier);
-        if (filePath == null) {
+        String cachedFilePath = resolutionCache.getCachedResolution(projectName, identifier);
+        if (cachedFilePath == null) {
             return null;
         }
 
-        PsiFile cachedResult = SourceCodeFileResolver.getFileFromAbsolutePath(filePath, psiManager);
-        if (cachedResult == null) {
+        PsiFile fileRetrievedFromCachedPath = SourceCodeFileResolver.getFileFromAbsolutePath(cachedFilePath, psiManager);
+        if (fileRetrievedFromCachedPath == null) {
             resolutionCache.removeCachedResolution(projectName, identifier);
             return null;
         }
 
-        return cachedResult;
+        return fileRetrievedFromCachedPath;
     }
 
     @Nullable
-    private PsiFile resolveManuallyAndCache(PsiManager psiManager) {
+    private PsiFile resolveManuallyAndStoreInCache(PsiManager psiManager) {
         PsiFile file = resolveToDependencyInjectionFileFromIdentifier(identifier, psiManager);
 
         if (file == null) {
