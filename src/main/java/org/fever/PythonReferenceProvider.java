@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.QualifiedName;
 import com.intellij.util.ProcessingContext;
 import com.jetbrains.python.psi.PyCallExpression;
+import com.jetbrains.python.psi.PyReferenceExpression;
 import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,7 +52,11 @@ public class PythonReferenceProvider extends ReferenceProvider {
         if (!(grandParent instanceof PyCallExpression)) {
             return false;
         }
-        QualifiedName qualifiedName = ((PyReferenceExpressionImpl) grandParent.getFirstChild()).asQualifiedName();
+        PsiElement firstChild = grandParent.getFirstChild();
+        if (!(firstChild instanceof PyReferenceExpressionImpl)) {
+            return false;
+        }
+        QualifiedName qualifiedName = ((PyReferenceExpression) firstChild).asQualifiedName();
         if (qualifiedName == null) {
             return false;
         }

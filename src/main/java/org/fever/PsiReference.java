@@ -1,5 +1,6 @@
 package org.fever;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
@@ -21,11 +22,15 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
             "container(?:_builder)?\\.set\\(\\s*\"(\\S+)\"",
             "container_builder\\.set_definition\\(\\s*Definition\\(\\s*\"(\\S+)\"",
     };
+    private final ResolutionCache.State resolutionCache;
+    private final String projectName;
 
     public PsiReference(@NotNull PsiElement element, TextRange textRange, String identifier) {
         super(element, textRange);
 
         this.identifier = this.cleanIdentifier(identifier);
+        this.resolutionCache = ApplicationManager.getApplication().getService(ResolutionCache.class).getState();
+        this.projectName = element.getProject().getName();
     }
 
     private String cleanIdentifier(String identifier) {
@@ -33,12 +38,41 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
     }
 
     @Override
-    public @Nullable PsiElement resolve() {
+    public @Nullable PsiFile resolve() {
         PsiManager psiManager = getElement().getManager();
-        PsiElement file = resolveToDependencyInjectionFileFromIdentifier(identifier, psiManager);
+
+        PsiFile dependencyInjectionFile = resolveFromCache(psiManager);
+        if (dependencyInjectionFile != null) {
+            return dependencyInjectionFile;
+        }
+        return resolveManuallyAndStoreInCache(psiManager);
+    }
+
+    private PsiFile resolveFromCache(PsiManager psiManager) {
+        String cachedFilePath = resolutionCache.getCachedResolution(projectName, identifier);
+        if (cachedFilePath == null) {
+            return null;
+        }
+
+        PsiFile fileRetrievedFromCachedPath = SourceCodeFileResolver.getFileFromAbsolutePath(cachedFilePath, psiManager);
+        if (fileRetrievedFromCachedPath == null) {
+            resolutionCache.removeCachedResolution(projectName, identifier);
+            return null;
+        }
+
+        return fileRetrievedFromCachedPath;
+    }
+
+    @Nullable
+    private PsiFile resolveManuallyAndStoreInCache(PsiManager psiManager) {
+        PsiFile file = resolveToDependencyInjectionFileFromIdentifier(identifier, psiManager);
 
         if (file == null) {
             file = resolveToDependencyInjectionManualDeclaration(identifier, psiManager);
+        }
+        if (file != null) {
+            String filePath = file.getVirtualFile().getPath();
+            resolutionCache.setCachedResolution(projectName, identifier, filePath);
         }
         if (file == null) {
             file = tryFallingBackToSourceCodeFileUsingIdentifierAsFqn(identifier, psiManager);
@@ -47,7 +81,7 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
         return file;
     }
 
-    private @Nullable PsiElement resolveToDependencyInjectionFileFromIdentifier(String identifier, PsiManager psiManager) {
+    private @Nullable PsiFile resolveToDependencyInjectionFileFromIdentifier(String identifier, PsiManager psiManager) {
         String diFileDirectory = getAbsoluteDependencyInjectionFileDirectory(identifier);
         String diFileName = SourceCodeFileResolver.getClassNameInSnakeCase(identifier);
 
@@ -87,7 +121,7 @@ public class PsiReference extends PsiReferenceBase<PsiElement> {
         return absoluteBasePath + "/src/" + djangoAppName + GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER + relativeFilePath;
     }
 
-    private PsiElement resolveToDependencyInjectionManualDeclaration(String identifier, PsiManager psiManager) {
+    private PsiFile resolveToDependencyInjectionManualDeclaration(String identifier, PsiManager psiManager) {
         GlobalSearchScope scope = new DependencyInjectionSearchScope(getElement().getProject());
         Collection<VirtualFile> dependencyInjectionFiles = FileBasedIndex.getInstance()
                 .getContainingFiles(
