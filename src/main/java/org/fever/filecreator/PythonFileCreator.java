@@ -1,6 +1,5 @@
 package org.fever.filecreator;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.jetbrains.python.PythonFileType;
@@ -26,12 +25,12 @@ public class PythonFileCreator {
                 )
                     """;
 
-    public static PsiFile create(Project project, String fileName, String fqn) {
+    public static PsiFile create(PsiFile sourceCodeFile, String fqn) {
         String baseContent = PYTHON_DI_FILE_CONTENT_TEMPLATE.replace("{fqn}", fqn);
         String contentWithArguments = baseContent.replace("{arguments}", getArguments());
 
-        return PsiFileFactory.getInstance(project).createFileFromText(
-                fileName,
+        return PsiFileFactory.getInstance(sourceCodeFile.getProject()).createFileFromText(
+                sourceCodeFile.getName(),
                 PythonFileType.INSTANCE,
                 contentWithArguments
         );

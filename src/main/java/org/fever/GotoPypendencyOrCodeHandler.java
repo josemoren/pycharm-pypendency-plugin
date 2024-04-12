@@ -165,11 +165,8 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
 
     private void createAndOpenYamlDIFile(Editor editor, PsiFile file) {
         PsiDirectory directory = makePypendencyDirectoryForFile(file);
-        PsiFile yamlDIFile = YamlFileCreator.create(
-                file.getProject(),
-                file.getName().replace(".py", ".yaml"),
-                this.getCurrentFQN(editor, file)
-        );
+        String fqn = this.getCurrentFQN(editor, file);
+        PsiFile yamlDIFile = YamlFileCreator.create(file, fqn);
 
         PsiFile new_file = WriteAction.compute(
                 () -> (PsiFile) directory.add(yamlDIFile)
@@ -199,7 +196,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
     private void createAndOpenPythonDIFile(Editor editor, PsiFile file) {
         PsiDirectory directory = makePypendencyDirectoryForFile(file);
         String fqn = this.getCurrentFQN(editor, file);
-        PsiFile pythonDIFile = PythonFileCreator.create(file.getProject(), file.getName(), fqn);
+        PsiFile pythonDIFile = PythonFileCreator.create(file, fqn);
 
         PsiFile new_file = WriteAction.compute(
                 () -> (PsiFile) directory.add(pythonDIFile)
