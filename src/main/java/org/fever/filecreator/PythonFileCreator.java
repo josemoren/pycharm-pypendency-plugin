@@ -52,13 +52,14 @@ public class PythonFileCreator {
             if (initArgument.isNotAClass()) {
                 arguments.append(noKwArgumentBuilder(null, initArgument.message));
             } else if (initArgument.hasNoImplementations()) {
-                arguments.append(noKwArgumentBuilder("No implementation found for " + initArgument.parentClass.getName(), null));
+                String message = "TODO: missing implementation";
+                arguments.append(noKwArgumentBuilder("No implementation found for " + initArgument.parentClass.getName(), message));
             } else {
-                arguments.append(noKwArgumentBuilder(initArgument.fqn, null));
+                arguments.append(noKwArgumentBuilder("@" + initArgument.fqn, null));
             }
             if (FileCreator.countImplementations(initArgument, initArguments) > 1) {
                 String message = "TODO: multiple implementations found for " + initArgument.parentClass.getName() + ", leave only one";
-                arguments.append(noKwArgumentBuilder(initArgument.fqn, message));
+                arguments.append(noKwArgumentBuilder("@" + initArgument.fqn, message));
             }
         }
         arguments.append("\n").append(" ".repeat(12));
