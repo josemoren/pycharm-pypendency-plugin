@@ -38,7 +38,7 @@ public class GotoCodeHandler extends GotoTargetHandler {
             return null;
         }
 
-        String fqn = parseMainFqn(dependencyInjectionFile);
+        String fqn = FqnExtractor.extractFqnFromDIFile(dependencyInjectionFile);
         if (fqn == null) {
             return null;
         }
@@ -53,30 +53,6 @@ public class GotoCodeHandler extends GotoTargetHandler {
                 dependencyInjectionFile,
                 targets,
                 new SmartList<>());
-    }
-
-    private @Nullable String parseMainFqn(PsiFile dependencyInjectionFile) {
-        String extension = dependencyInjectionFile.getVirtualFile().getExtension();
-        if (extension == null) {
-            return null;
-        }
-
-        String fileContent = dependencyInjectionFile.getText();
-        if (isYamlFile(extension)) {
-            return FqnExtractor.extractFqnFromYaml(fileContent);
-        }
-        if (isPythonFile(extension)) {
-            return FqnExtractor.extractFqnFromPython(fileContent);
-        }
-        return null;
-    }
-
-    private Boolean isYamlFile(String extension) {
-        return extension.equals("yaml") || extension.equals("yml");
-    }
-
-    private Boolean isPythonFile(String extension) {
-        return extension.equals("py");
     }
 
     @Override
