@@ -13,7 +13,7 @@ import static org.fever.GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER;
 
 
 public class PythonReferenceProvider extends ReferenceProvider {
-    private static final String IDENTIFIER_REGEX_FOR_CONTAINER_BUILDER_GET = "^[a-z0-9_.]+\\.[A-Za-z0-9_]+$";
+    private static final String IDENTIFIER_REGEX_FOR_CONTAINER_BUILDER_STATEMENT = "^[a-z0-9_.]+\\.[A-Za-z0-9_]+$";
 
     @Override
     public com.intellij.psi.PsiReference @NotNull [] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
@@ -23,8 +23,8 @@ public class PythonReferenceProvider extends ReferenceProvider {
             if (text.matches(IDENTIFIER_REGEX_FOR_DI_FILES)) {
                 return getReferenceForIdentifierAsArray(element, text);
             }
-        } else if (isInContainerBuilderGet(element)) {
-            if (text.matches(IDENTIFIER_REGEX_FOR_CONTAINER_BUILDER_GET)) {
+        } else if (isInContainerBuilderStatement(element)) {
+            if (text.matches(IDENTIFIER_REGEX_FOR_CONTAINER_BUILDER_STATEMENT)) {
                 return getReferenceForIdentifierAsArray(element, text);
             }
         }
@@ -47,7 +47,7 @@ public class PythonReferenceProvider extends ReferenceProvider {
         PsiReference reference = getReferenceForIdentifier(element, text);
         return new PsiReference[]{reference};
     }
-    private boolean isInContainerBuilderGet(PsiElement element) {
+    private boolean isInContainerBuilderStatement(PsiElement element) {
         PsiElement grandParent = element.getParent().getParent();
         if (!(grandParent instanceof PyCallExpression)) {
             return false;
@@ -61,6 +61,6 @@ public class PythonReferenceProvider extends ReferenceProvider {
             return false;
         }
 
-        return qualifiedName.toString().equals("container_builder.get");
+        return qualifiedName.toString().matches(".*container_.+\\.(register|get)");
     }
 }
