@@ -16,10 +16,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.util.SmartList;
 import com.jetbrains.python.psi.PyFile;
-import org.fever.filecreator.PythonFileCreator;
-import org.fever.filecreator.YamlFileCreator;
-import org.fever.filecreator.PythonFileCreator;
-import org.fever.filecreator.YamlFileCreator;
+import org.fever.filecreator.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,7 +106,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
 
             @Override
             public void execute() {
-                self.createAndOpenYamlDIFile(editor, file);
+                self.createAndOpenDIFIle(editor, file, DIFileType.YAML);
             }
         });
 
@@ -127,7 +124,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
 
             @Override
             public void execute() {
-                self.createAndOpenPythonDIFile(editor, file);
+                self.createAndOpenDIFIle(editor, file, DIFileType.PYTHON);
             }
         });
 
@@ -168,20 +165,20 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
         return null;
     }
 
-    private void createAndOpenYamlDIFile(Editor editor, PsiFile file) {
+    private void createAndOpenDIFIle(Editor editor, PsiFile file, DIFileType type) {
         PsiDirectory directory = makePypendencyDirectoryForFile(file);
         PyFile sourceCodeFile = (PyFile) file;
         String fqn = this.getCurrentFQN(editor, file);
-        PsiFile yamlDIFile = YamlFileCreator.create(sourceCodeFile, fqn);
+        PsiFile dependencyInjectionFile = DIFileCreator.create(sourceCodeFile, fqn, type);
 
         PsiFile new_file = WriteAction.compute(
-                () -> (PsiFile) directory.add(yamlDIFile)
+                () -> (PsiFile) directory.add(dependencyInjectionFile)
         );
 
         Project fileProject = file.getProject();
         FileEditorManager.getInstance(fileProject).openFile(new_file.getVirtualFile(), true);
-    }
 
+    }
     private PsiDirectory makePypendencyDirectoryForFile(PsiFile file) {
         VirtualFile diPath = getDIPath(file);
         assert diPath != null;
@@ -197,19 +194,6 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
         return WriteAction.compute(
                 () -> DirectoryUtil.mkdirs(PsiManager.getInstance(fileProject), diNewPath)
         );
-    }
-
-    private void createAndOpenPythonDIFile(Editor editor, PsiFile file) {
-        PsiDirectory directory = makePypendencyDirectoryForFile(file);
-        PyFile sourceCodeFile = (PyFile) file;
-        String fqn = this.getCurrentFQN(editor, file);
-        PsiFile pythonDIFile = PythonFileCreator.create(sourceCodeFile, fqn);
-
-        PsiFile new_file = WriteAction.compute(
-                () -> (PsiFile) directory.add(pythonDIFile)
-        );
-        Project fileProject = file.getProject();
-        FileEditorManager.getInstance(fileProject).openFile(new_file.getVirtualFile(), true);
     }
 
     private static @Nullable VirtualFile getDIPath(@NotNull PsiFile file) {
