@@ -18,6 +18,8 @@ import com.intellij.util.SmartList;
 import com.jetbrains.python.psi.PyFile;
 import org.fever.filecreator.PythonFileCreator;
 import org.fever.filecreator.YamlFileCreator;
+import org.fever.filecreator.PythonFileCreator;
+import org.fever.filecreator.YamlFileCreator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
