@@ -15,9 +15,10 @@ import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.util.SmartList;
+import org.fever.filecreator.PythonFileCreator;
+import org.fever.filecreator.YamlFileCreator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.yaml.YAMLFileType;
 
 import javax.swing.*;
 import java.util.List;
@@ -105,7 +106,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
 
             @Override
             public void execute() {
-                self.createPypendencyYaml(editor, file);
+                self.createAndOpenYamlDIFile(editor, file);
             }
         });
 
@@ -123,7 +124,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
 
             @Override
             public void execute() {
-                self.createPypendencyPython(editor, file);
+                self.createAndOpenPythonDIFile(editor, file);
             }
         });
 
@@ -162,29 +163,17 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
         return null;
     }
 
-    private void createPypendencyYaml(Editor editor, PsiFile file) {
+    private void createAndOpenYamlDIFile(Editor editor, PsiFile file) {
         PsiDirectory directory = makePypendencyDirectoryForFile(file);
-        PsiFile psiFile = this.createYamlWithContent(editor, file);
+        String fqn = this.getCurrentFQN(editor, file);
+        PsiFile yamlDIFile = YamlFileCreator.create(file, fqn);
 
         PsiFile new_file = WriteAction.compute(
-                () -> (PsiFile) directory.add(psiFile)
+                () -> (PsiFile) directory.add(yamlDIFile)
         );
 
         Project fileProject = file.getProject();
         FileEditorManager.getInstance(fileProject).openFile(new_file.getVirtualFile(), true);
-    }
-
-    private PsiFile createYamlWithContent(Editor editor, PsiFile file) {
-        String fqn = this.getCurrentFQN(editor, file);
-        String yamlFileName = file.getName().replace(".py", ".yaml");
-        String yamlFileContent = fqn + ":\n    fqn: " + fqn;
-        Project fileProject = file.getProject();
-
-        return PsiFileFactory.getInstance(fileProject).createFileFromText(
-                yamlFileName,
-                YAMLFileType.YML,
-                yamlFileContent
-        );
     }
 
     private PsiDirectory makePypendencyDirectoryForFile(PsiFile file) {
@@ -204,46 +193,16 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
         );
     }
 
-    private void createPypendencyPython(Editor editor, PsiFile file) {
+    private void createAndOpenPythonDIFile(Editor editor, PsiFile file) {
         PsiDirectory directory = makePypendencyDirectoryForFile(file);
-        PsiFile psiFile = this.createPythonFileWithContent(editor, file);
+        String fqn = this.getCurrentFQN(editor, file);
+        PsiFile pythonDIFile = PythonFileCreator.create(file, fqn);
 
         PsiFile new_file = WriteAction.compute(
-                () -> (PsiFile) directory.add(psiFile)
+                () -> (PsiFile) directory.add(pythonDIFile)
         );
         Project fileProject = file.getProject();
         FileEditorManager.getInstance(fileProject).openFile(new_file.getVirtualFile(), true);
-    }
-
-    private PsiFile createPythonFileWithContent(Editor editor, PsiFile file) {
-        String fqn = this.getCurrentFQN(editor, file);
-
-        String text = "from pypendency.argument import Argument\n" +
-                "from pypendency.builder import ContainerBuilder\n" +
-                "from pypendency.definition import Definition\n" +
-                "\n" +
-                "from django.conf import settings\n" +
-                "\n" +
-                "\n" +
-                "def load(container_builder: ContainerBuilder) -> None:\n" +
-                "    container_builder.set_definition(\n" +
-                "        Definition(\n" +
-                "            \"" + fqn + "\",\n" +
-                "            \"" + fqn + "\",\n" +
-                "            [\n" +
-                "                Argument.no_kw_argument(),\n" +
-                "            ],\n" +
-                "        )\n" +
-                "    )\n" +
-                "";
-
-        Project fileProject = file.getProject();
-
-        return PsiFileFactory.getInstance(fileProject).createFileFromText(
-                file.getName(),
-                YAMLFileType.YML,
-                text
-        );
     }
 
     private @Nullable VirtualFile getDIPath(@NotNull PsiFile file) {
