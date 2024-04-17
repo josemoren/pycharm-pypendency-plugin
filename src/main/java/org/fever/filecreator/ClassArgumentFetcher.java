@@ -32,7 +32,7 @@ public class ClassArgumentFetcher {
             PyClass parameterClass = entry.getValue();
 
             if (parameterClass == null) {
-                identifiers.add(new IdentifierItem(null, null, parameter.getName()));
+                identifiers.add(new IdentifierItem(null, null, parameter));
                 continue;
             }
 
@@ -41,17 +41,17 @@ public class ClassArgumentFetcher {
                 PsiFile dependencyInjectionFile = GotoPypendencyOrCodeHandler.getPypendencyDefinition(parameterClass.getContainingFile());
                 String parameterClassIdentifier = IdentifierExtractor.extractIdentifierFromDIFile(dependencyInjectionFile);
                 if (parameterClassIdentifier != null) {
-                    identifiers.add(new IdentifierItem(parameterClassIdentifier, parameterClass));
+                    identifiers.add(new IdentifierItem(parameterClassIdentifier, parameterClass, parameter));
                     continue;
                 }
-                identifiers.add(new IdentifierItem(null, parameterClass));
+                identifiers.add(new IdentifierItem(null, parameterClass, parameter));
                 continue;
             }
 
             for (PyClass implementation: allImplementations) {
                 PsiFile dependencyInjectionFile = GotoPypendencyOrCodeHandler.getPypendencyDefinition(implementation.getOriginalElement().getContainingFile());
                 String implementationIdentifier = IdentifierExtractor.extractIdentifierFromDIFile(dependencyInjectionFile);
-                IdentifierItem item = new IdentifierItem(implementationIdentifier, parameterClass);
+                IdentifierItem item = new IdentifierItem(implementationIdentifier, parameterClass, parameter);
                 if (!identifiers.contains(item)) {
                     identifiers.add(item);
                 }
@@ -67,7 +67,7 @@ public class ClassArgumentFetcher {
             return new HashMap<>();
         }
         PyParameter[] initParameters = initMethod.getParameterList().getParameters();
-        PyParameter[] initParametersWithoutSelf = ArrayUtils.remove(initParameters, SELF_INDEX_IN_PARAMETER_LIST);
+        PyParameter[] initParametersWithoutSelf = (PyParameter[]) ArrayUtils.remove(initParameters, SELF_INDEX_IN_PARAMETER_LIST);
 
         Map<PyParameter, @Nullable PyClass> paramsToClasses = new OrderedHashMap<>();
         for (PyParameter parameter: initParametersWithoutSelf) {
