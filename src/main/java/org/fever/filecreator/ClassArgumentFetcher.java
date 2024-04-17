@@ -9,7 +9,7 @@ import com.jetbrains.python.psi.types.TypeEvalContext;
 import groovyjarjarantlr4.v4.misc.OrderedHashMap;
 import org.apache.commons.lang.ArrayUtils;
 import org.fever.GotoPypendencyOrCodeHandler;
-import org.fever.utils.FqnExtractor;
+import org.fever.utils.IdentifierExtractor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -17,8 +17,8 @@ import java.util.*;
 public class ClassArgumentFetcher {
     private static final int SELF_INDEX_IN_PARAMETER_LIST = 0;
 
-    public static Collection<FQNItem> getFqnOfInitArguments(PyFile sourceCodeFile) {
-        List<FQNItem> fqns = new ArrayList<>();
+    public static Collection<IdentifierItem> getFqnOfInitArguments(PyFile sourceCodeFile) {
+        List<IdentifierItem> identifiers = new ArrayList<>();
 
         PyClass pyClass = sourceCodeFile.getTopLevelClasses().get(0);
         TypeEvalContext context = TypeEvalContext.codeCompletion(
@@ -32,33 +32,33 @@ public class ClassArgumentFetcher {
             PyClass parameterClass = entry.getValue();
 
             if (parameterClass == null) {
-                fqns.add(new FQNItem(null, null, parameter.getName()));
+                identifiers.add(new IdentifierItem(null, null, parameter.getName()));
                 continue;
             }
 
             Collection<PyClass> allImplementations = PyClassInheritorsSearch.search(parameterClass, false).findAll();
             if (allImplementations.isEmpty()) {
                 PsiFile dependencyInjectionFile = GotoPypendencyOrCodeHandler.getPypendencyDefinition(parameterClass.getContainingFile());
-                String parameterClassFqn = FqnExtractor.extractFqnFromDIFile(dependencyInjectionFile);
-                if (parameterClassFqn != null) {
-                    fqns.add(new FQNItem(parameterClassFqn, parameterClass));
+                String parameterClassIdentifier = IdentifierExtractor.extractIdentifierFromDIFile(dependencyInjectionFile);
+                if (parameterClassIdentifier != null) {
+                    identifiers.add(new IdentifierItem(parameterClassIdentifier, parameterClass));
                     continue;
                 }
-                fqns.add(new FQNItem(null, parameterClass));
+                identifiers.add(new IdentifierItem(null, parameterClass));
                 continue;
             }
 
             for (PyClass implementation: allImplementations) {
                 PsiFile dependencyInjectionFile = GotoPypendencyOrCodeHandler.getPypendencyDefinition(implementation.getOriginalElement().getContainingFile());
-                String implementationFqn = FqnExtractor.extractFqnFromDIFile(dependencyInjectionFile);
-                FQNItem item = new FQNItem(implementationFqn, parameterClass);
-                if (!fqns.contains(item)) {
-                    fqns.add(item);
+                String implementationIdentifier = IdentifierExtractor.extractIdentifierFromDIFile(dependencyInjectionFile);
+                IdentifierItem item = new IdentifierItem(implementationIdentifier, parameterClass);
+                if (!identifiers.contains(item)) {
+                    identifiers.add(item);
                 }
             }
         }
 
-        return fqns;
+        return identifiers;
     }
 
     private static Map<PyParameter, @Nullable PyClass> getClassesFromInitParams(PyClass pyClass, TypeEvalContext context) {
@@ -67,7 +67,7 @@ public class ClassArgumentFetcher {
             return new HashMap<>();
         }
         PyParameter[] initParameters = initMethod.getParameterList().getParameters();
-        PyParameter[] initParametersWithoutSelf = (PyParameter[]) ArrayUtils.remove(initParameters, SELF_INDEX_IN_PARAMETER_LIST);
+        PyParameter[] initParametersWithoutSelf = ArrayUtils.remove(initParameters, SELF_INDEX_IN_PARAMETER_LIST);
 
         Map<PyParameter, @Nullable PyClass> paramsToClasses = new OrderedHashMap<>();
         for (PyParameter parameter: initParametersWithoutSelf) {

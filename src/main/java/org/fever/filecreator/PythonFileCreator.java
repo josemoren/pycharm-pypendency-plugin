@@ -40,14 +40,14 @@ public class PythonFileCreator {
     }
 
     private static String getArguments(PyFile sourceCodeFile) {
-        Collection<FQNItem> initArguments = ClassArgumentFetcher.getFqnOfInitArguments(sourceCodeFile);
+        Collection<IdentifierItem> initArguments = ClassArgumentFetcher.getFqnOfInitArguments(sourceCodeFile);
         if (initArguments.isEmpty()) {
             return "";
         }
 
         StringBuilder arguments = new StringBuilder();
 
-        for (FQNItem initArgument : initArguments) {
+        for (IdentifierItem initArgument : initArguments) {
             arguments.append("\n").append(ARGUMENT_INDENTATION);
             if (initArgument.isNotAClass()) {
                 arguments.append(noKwArgumentBuilder(null, initArgument.message));
@@ -55,11 +55,11 @@ public class PythonFileCreator {
                 String message = "TODO: missing implementation";
                 arguments.append(noKwArgumentBuilder("No implementation found for " + initArgument.parentClass.getName(), message));
             } else {
-                arguments.append(noKwArgumentBuilder("@" + initArgument.fqn, null));
+                arguments.append(noKwArgumentBuilder("@" + initArgument.identifier, null));
             }
             if (FileCreator.countImplementations(initArgument, initArguments) > 1) {
                 String message = "TODO: multiple implementations found for " + initArgument.parentClass.getName() + ", leave only one";
-                arguments.append(noKwArgumentBuilder("@" + initArgument.fqn, message));
+                arguments.append(noKwArgumentBuilder("@" + initArgument.identifier, message));
             }
         }
         arguments.append("\n").append(" ".repeat(12));
