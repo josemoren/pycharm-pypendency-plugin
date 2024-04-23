@@ -11,4 +11,5 @@ public interface DIFileTemplate {
     String getMultipleArgumentsTemplate();
     String getMissingArgumentTemplate();
     String getArgumentTemplate();
+    String getArgumentStatementEnd();
 }

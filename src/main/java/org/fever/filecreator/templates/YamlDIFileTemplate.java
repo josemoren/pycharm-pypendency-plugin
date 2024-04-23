@@ -10,13 +10,12 @@ public class YamlDIFileTemplate implements DIFileTemplate {
     private static final String BASE_TEMPLATE = """
             {identifier}:
                 fqn: {fqn}{arguments}
-                    """;
-    private static final String ARGUMENT_STATEMENT_BEGINNING = "    args:";
-    // TODO: same as py
+            """;
+    private static final String ARGUMENT_STATEMENT_BEGINNING = "\n    args:";
     private static final String MULTIPLE_ARGUMENTS_TEMPLATE = "# TODO: multiple arguments found for %s, leave only one:";
-    // TODO: same as py
     private static final String MISSING_ARGUMENT_TEMPLATE = "# TODO: missing argument for \"%s\"";
     private static final String ARGUMENT_TEMPLATE = "- \"@%s\"";
+    private static final String ARGUMENT_STATEMENT_END = null;
 
     @Override
     public String getFileExtension() {
@@ -56,5 +55,10 @@ public class YamlDIFileTemplate implements DIFileTemplate {
     @Override
     public String getArgumentTemplate() {
         return ARGUMENT_TEMPLATE;
+    }
+
+    @Override
+    public String getArgumentStatementEnd() {
+        return ARGUMENT_STATEMENT_END;
     }
 }

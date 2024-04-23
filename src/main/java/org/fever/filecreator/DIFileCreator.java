@@ -18,15 +18,15 @@ public class DIFileCreator {
 
     public static PsiFile create(PyFile sourceCodeFile, String identifier, DIFileType type) {
         DIFileTemplate fileTemplate = getDIFileTemplate(type);
-        String baseContent = fileTemplate.getBaseTemplate()
+        String fileContent = fileTemplate.getBaseTemplate()
                 .replace("{identifier}", identifier)
-                .replace("{fqn}", identifier);
-        String contentWithArguments = baseContent.concat(getArguments(sourceCodeFile, fileTemplate));
+                .replace("{fqn}", identifier)
+                .replace("{arguments}", getArguments(sourceCodeFile, fileTemplate));
 
         return PsiFileFactory.getInstance(sourceCodeFile.getProject()).createFileFromText(
                 sourceCodeFile.getName().replace(".py", fileTemplate.getFileExtension()),
                 fileTemplate.getFileType(),
-                contentWithArguments
+                fileContent
         );
     }
 
@@ -49,7 +49,7 @@ public class DIFileCreator {
             PyParameter parameter = entry.getKey();
             List<IdentifierItem> initArgumentsForParameter = entry.getValue();
 
-            if (initArgumentsForParameter.size() > 1) {
+            if (numberOfImplementationsForParameter(initArgumentsForParameter) > 1) {
                 appendWithIndentation(builder, numberOfSpaces, fileTemplate.getMultipleArgumentsTemplate().formatted(parameter.getName()));
             }
             for (IdentifierItem initArgument : initArgumentsForParameter) {
@@ -60,12 +60,16 @@ public class DIFileCreator {
                 }
             }
 
-            if (initArgumentsForParameter.size() > 1) {
+            if (numberOfImplementationsForParameter(initArgumentsForParameter) > 1) {
                 builder.append("\n");
             }
         }
-        builder.append("\n").append(" ".repeat(12));
+        builder.append(fileTemplate.getArgumentStatementEnd());
         return builder.toString();
+    }
+
+    private static long numberOfImplementationsForParameter(List<IdentifierItem> initArgumentsForParameter) {
+        return initArgumentsForParameter.stream().filter(x -> x.identifier != null).count();
     }
 
     private static OrderedHashMap<PyParameter, List<IdentifierItem>> groupIdentifiersByParameter(Collection<IdentifierItem> identifiers) {
