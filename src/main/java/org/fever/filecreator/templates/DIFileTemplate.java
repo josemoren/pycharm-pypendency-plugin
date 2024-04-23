@@ -8,7 +8,8 @@ public interface DIFileTemplate {
     int getArgumentIndentationSpaces();
     String getBaseTemplate();
     String getArgumentStatementBeginning();
-    String getMultipleArgumentsTemplate();
+    String getMultipleArgumentsTemplateBeginning();
+    String getMultipleArgumentsTemplateEnd();
     String getMissingArgumentTemplate();
     String getArgumentTemplate();
     String getArgumentStatementEnd();

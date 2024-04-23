@@ -25,8 +25,9 @@ public class PythonDIFileTemplate implements DIFileTemplate {
                 )
                     """;
     private static final String ARGUMENT_STATEMENT_BEGINNING = "";
-    private static final String MULTIPLE_ARGUMENTS_TEMPLATE = "# TODO: multiple arguments found for %s, leave only one:";
-    private static final String MISSING_ARGUMENT_TEMPLATE = "# TODO: missing argument for \"%s\"";
+    private static final String MULTIPLE_ARGUMENTS_TEMPLATE_BEGINNING = "# TODO: 👇 Multiple arguments found for %s, leave only one:";
+    private static final String MULTIPLE_ARGUMENTS_TEMPLATE_END = "# TODO: 👆";
+    private static final String MISSING_ARGUMENT_TEMPLATE = "Argument.no_kw_argument(\"@\"),  # TODO: missing argument for \"%s\"";
     private static final String ARGUMENT_TEMPLATE = "Argument.no_kw_argument(\"@%s\"),";
     private static final String ARGUMENT_STATEMENT_END = "\n            ";
 
@@ -56,8 +57,13 @@ public class PythonDIFileTemplate implements DIFileTemplate {
     }
 
     @Override
-    public String getMultipleArgumentsTemplate() {
-        return MULTIPLE_ARGUMENTS_TEMPLATE;
+    public String getMultipleArgumentsTemplateBeginning() {
+        return MULTIPLE_ARGUMENTS_TEMPLATE_BEGINNING;
+    }
+
+    @Override
+    public String getMultipleArgumentsTemplateEnd() {
+        return MULTIPLE_ARGUMENTS_TEMPLATE_END;
     }
 
     @Override

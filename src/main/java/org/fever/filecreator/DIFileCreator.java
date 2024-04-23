@@ -50,7 +50,7 @@ public class DIFileCreator {
             List<IdentifierItem> initArgumentsForParameter = entry.getValue();
 
             if (numberOfImplementationsForParameter(initArgumentsForParameter) > 1) {
-                appendWithIndentation(builder, numberOfSpaces, fileTemplate.getMultipleArgumentsTemplate().formatted(parameter.getName()));
+                appendWithIndentation(builder, numberOfSpaces, fileTemplate.getMultipleArgumentsTemplateBeginning().formatted(parameter.getName()));
             }
             for (IdentifierItem initArgument : initArgumentsForParameter) {
                 if (initArgument.isNotAClass() || (initArgument.hasNoImplementations() && initArgumentsForParameter.size() == 1)) {
@@ -61,7 +61,7 @@ public class DIFileCreator {
             }
 
             if (numberOfImplementationsForParameter(initArgumentsForParameter) > 1) {
-                builder.append("\n");
+                appendWithIndentation(builder, numberOfSpaces, fileTemplate.getMultipleArgumentsTemplateEnd());
             }
         }
         builder.append(fileTemplate.getArgumentStatementEnd());
