@@ -15,7 +15,7 @@ public class YamlDIFileTemplate implements DIFileTemplate {
     private static final String MULTIPLE_ARGUMENTS_TEMPLATE = "# TODO: multiple arguments found for %s, leave only one:";
     private static final String MISSING_ARGUMENT_TEMPLATE = "# TODO: missing argument for \"%s\"";
     private static final String ARGUMENT_TEMPLATE = "- \"@%s\"";
-    private static final String ARGUMENT_STATEMENT_END = null;
+    private static final String ARGUMENT_STATEMENT_END = "";
 
     @Override
     public String getFileExtension() {
