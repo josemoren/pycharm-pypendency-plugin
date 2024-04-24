@@ -68,7 +68,7 @@ public class ClassArgumentFetcher {
     }
 
     private static String getIdentifierFromCache(PyFile sourceCodeFile, PyParameter parameter) {
-        Matcher argumentTypeMatcher = Pattern.compile("\\w+:\\s+(\\w+)").matcher(parameter.getText());
+        Matcher argumentTypeMatcher = Pattern.compile("\\w+:\\s*(\\w+)").matcher(parameter.getText());
         @Nullable String argumentTypeString = argumentTypeMatcher.find() ? argumentTypeMatcher.group(1) : null;
         if (argumentTypeString == null || resolutionCacheState == null) {
             return null;
