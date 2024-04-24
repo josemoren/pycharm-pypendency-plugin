@@ -1,5 +1,6 @@
 package org.fever.filecreator;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.python.psi.*;
 import com.jetbrains.python.psi.search.PyClassInheritorsSearch;
@@ -9,13 +10,17 @@ import com.jetbrains.python.psi.types.TypeEvalContext;
 import groovyjarjarantlr4.v4.misc.OrderedHashMap;
 import org.apache.commons.lang.ArrayUtils;
 import org.fever.GotoPypendencyOrCodeHandler;
+import org.fever.ResolutionCache;
 import org.fever.utils.IdentifierExtractor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ClassArgumentFetcher {
     private static final int SELF_INDEX_IN_PARAMETER_LIST = 0;
+    private static final ResolutionCache.State resolutionCacheState = ApplicationManager.getApplication().getService(ResolutionCache.class).getState();
 
     public static Collection<IdentifierItem> getFqnOfInitArguments(PyFile sourceCodeFile) {
         List<IdentifierItem> identifiers = new ArrayList<>();
@@ -27,12 +32,13 @@ public class ClassArgumentFetcher {
         );
         Map<PyParameter, @Nullable PyClass> initParamsToClasses = getClassesFromInitParams(pyClass, context);
 
-        for (Map.Entry<PyParameter, @Nullable PyClass> entry: initParamsToClasses.entrySet()) {
+        for (Map.Entry<PyParameter, @Nullable PyClass> entry : initParamsToClasses.entrySet()) {
             PyParameter parameter = entry.getKey();
             PyClass parameterClass = entry.getValue();
 
             if (parameterClass == null) {
-                identifiers.add(new IdentifierItem(null, null, parameter));
+                @Nullable String identifier = getIdentifierFromCache(sourceCodeFile, parameter);
+                identifiers.add(new IdentifierItem(identifier, null, parameter));
                 continue;
             }
 
@@ -48,7 +54,7 @@ public class ClassArgumentFetcher {
                 continue;
             }
 
-            for (PyClass implementation: allImplementations) {
+            for (PyClass implementation : allImplementations) {
                 PsiFile dependencyInjectionFile = GotoPypendencyOrCodeHandler.getPypendencyDefinition(implementation.getOriginalElement().getContainingFile());
                 String implementationIdentifier = IdentifierExtractor.extractIdentifierFromDIFile(dependencyInjectionFile);
                 IdentifierItem item = new IdentifierItem(implementationIdentifier, parameterClass, parameter);
@@ -61,6 +67,16 @@ public class ClassArgumentFetcher {
         return identifiers;
     }
 
+    private static String getIdentifierFromCache(PyFile sourceCodeFile, PyParameter parameter) {
+        Matcher argumentTypeMatcher = Pattern.compile("\\w+:\\s+(\\w+)").matcher(parameter.getText());
+        @Nullable String argumentTypeString = argumentTypeMatcher.find() ? argumentTypeMatcher.group(1) : null;
+        if (argumentTypeString == null || resolutionCacheState == null) {
+            return null;
+        }
+        String projectName = sourceCodeFile.getProject().getName();
+        return resolutionCacheState.getCachedIdentifierByClass(projectName, argumentTypeString);
+    }
+
     private static Map<PyParameter, @Nullable PyClass> getClassesFromInitParams(PyClass pyClass, TypeEvalContext context) {
         PyFunction initMethod = pyClass.findInitOrNew(false, context);
         if (initMethod == null) {
@@ -70,7 +86,7 @@ public class ClassArgumentFetcher {
         PyParameter[] initParametersWithoutSelf = (PyParameter[]) ArrayUtils.remove(initParameters, SELF_INDEX_IN_PARAMETER_LIST);
 
         Map<PyParameter, @Nullable PyClass> paramsToClasses = new OrderedHashMap<>();
-        for (PyParameter parameter: initParametersWithoutSelf) {
+        for (PyParameter parameter : initParametersWithoutSelf) {
             PyType argumentType = parameter.getAsNamed().getArgumentType(context);
             if (!(argumentType instanceof PyClassType)) {
                 paramsToClasses.put(parameter, null);

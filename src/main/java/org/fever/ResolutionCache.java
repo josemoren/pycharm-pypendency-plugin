@@ -11,8 +11,8 @@ import java.util.Map;
         name = "ReferenceCache",
         storages = {@Storage(StoragePathMacros.CACHE_FILE)}
 )
-final class ResolutionCache implements PersistentStateComponent<ResolutionCache.State> {
-    static class State {
+public final class ResolutionCache implements PersistentStateComponent<ResolutionCache.State> {
+    public static class State {
         public Map<String, Map<String, String>> resolutionCache;
 
         public State() {
@@ -33,6 +33,13 @@ final class ResolutionCache implements PersistentStateComponent<ResolutionCache.
 
         public void removeCachedResolution(String projectName, String identifier) {
             this.getResolutionCacheForProject(projectName).remove(identifier);
+        }
+
+        public String getCachedIdentifierByClass(String projectName, String className) {
+            return this.getResolutionCacheForProject(projectName).keySet().stream()
+                    .filter(identifier -> identifier != null && identifier.endsWith("." + className))
+                    .findFirst()
+                    .orElse(null);
         }
     }
 
