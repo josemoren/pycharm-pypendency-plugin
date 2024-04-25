@@ -11,12 +11,11 @@ import groovyjarjarantlr4.v4.misc.OrderedHashMap;
 import org.apache.commons.lang.ArrayUtils;
 import org.fever.GotoPypendencyOrCodeHandler;
 import org.fever.ResolutionCache;
+import org.fever.utils.ClassArgumentParser;
 import org.fever.utils.IdentifierExtractor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ClassArgumentFetcher {
     private static final int SELF_INDEX_IN_PARAMETER_LIST = 0;
@@ -68,13 +67,12 @@ public class ClassArgumentFetcher {
     }
 
     private static String getIdentifierFromCache(PyFile sourceCodeFile, PyParameter parameter) {
-        Matcher argumentTypeMatcher = Pattern.compile("\\w+:\\s*(\\w+)").matcher(parameter.getText());
-        @Nullable String argumentTypeString = argumentTypeMatcher.find() ? argumentTypeMatcher.group(1) : null;
-        if (argumentTypeString == null || resolutionCacheState == null) {
+        @Nullable String argumentType = ClassArgumentParser.parse(parameter.getText());
+        if (argumentType == null || resolutionCacheState == null) {
             return null;
         }
         String projectName = sourceCodeFile.getProject().getName();
-        return resolutionCacheState.getCachedIdentifierByClass(projectName, argumentTypeString);
+        return resolutionCacheState.getCachedIdentifierByClass(projectName, argumentType);
     }
 
     private static Map<PyParameter, @Nullable PyClass> getClassesFromInitParams(PyClass pyClass, TypeEvalContext context) {

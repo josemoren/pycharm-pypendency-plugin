@@ -8,6 +8,8 @@ import groovyjarjarantlr4.v4.misc.OrderedHashMap;
 import org.fever.filecreator.templates.DIFileTemplate;
 import org.fever.filecreator.templates.PythonDIFileTemplate;
 import org.fever.filecreator.templates.YamlDIFileTemplate;
+import org.fever.utils.ClassArgumentParser;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -54,7 +56,10 @@ public class DIFileCreator {
             }
             for (IdentifierItem initArgument : initArgumentsForParameter) {
                 if (initArgument.isNotAClass() || (initArgument.hasNoImplementations() && initArgumentsForParameter.size() == 1)) {
-                    appendWithIndentation(builder, numberOfSpaces, fileTemplate.getMissingArgumentTemplate().formatted(parameter.getName()));
+                    String parameterName = parameter.getName();
+                    @Nullable String parameterClass = ClassArgumentParser.parse(parameter.getText());
+                    if (parameterClass == null) parameterClass = "Unknown";
+                    appendWithIndentation(builder, numberOfSpaces, fileTemplate.getMissingArgumentTemplate().formatted(parameterName, parameterClass));
                 } else if (initArgument.identifier != null) {
                     appendWithIndentation(builder, numberOfSpaces, fileTemplate.getArgumentTemplate().formatted(initArgument.identifier));
                 }
