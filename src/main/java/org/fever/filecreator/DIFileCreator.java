@@ -2,6 +2,7 @@ package org.fever.filecreator;
 
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
+import com.jetbrains.python.psi.PyClass;
 import com.jetbrains.python.psi.PyFile;
 import com.jetbrains.python.psi.PyParameter;
 import groovyjarjarantlr4.v4.misc.OrderedHashMap;
@@ -18,12 +19,13 @@ import java.util.stream.Collectors;
 
 public class DIFileCreator {
 
-    public static PsiFile create(PyFile sourceCodeFile, String identifier, DIFileType type) {
+    public static PsiFile create(PyClass targetPyClass, String fqn, DIFileType type) {
+        PyFile sourceCodeFile = (PyFile) targetPyClass.getContainingFile();
         DIFileTemplate fileTemplate = getDIFileTemplate(type);
         String fileContent = fileTemplate.getBaseTemplate()
-                .replace("{identifier}", identifier)
-                .replace("{fqn}", identifier)
-                .replace("{arguments}", getArguments(sourceCodeFile, fileTemplate));
+                .replace("{identifier}", fqn)
+                .replace("{fqn}", fqn)
+                .replace("{arguments}", getArguments(targetPyClass, fileTemplate));
 
         return PsiFileFactory.getInstance(sourceCodeFile.getProject()).createFileFromText(
                 sourceCodeFile.getName().replace(".py", fileTemplate.getFileExtension()),
@@ -38,8 +40,8 @@ public class DIFileCreator {
         throw new IllegalArgumentException("Unknown DIFileType: " + type);
     }
 
-    private static String getArguments(PyFile sourceCodeFile, DIFileTemplate fileTemplate) {
-        Collection<IdentifierItem> initArguments = ClassArgumentFetcher.getFqnOfInitArguments(sourceCodeFile);
+    private static String getArguments(PyClass pyClass, DIFileTemplate fileTemplate) {
+        Collection<IdentifierItem> initArguments = ClassArgumentFetcher.getFqnOfInitArguments(pyClass);
         if (initArguments.isEmpty()) {
             return "";
         }

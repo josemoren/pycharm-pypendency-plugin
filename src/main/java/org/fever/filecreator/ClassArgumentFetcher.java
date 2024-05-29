@@ -1,6 +1,6 @@
 package org.fever.filecreator;
 
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.jetbrains.python.psi.*;
 import com.jetbrains.python.psi.search.PyClassInheritorsSearch;
@@ -9,52 +9,37 @@ import com.jetbrains.python.psi.types.PyType;
 import com.jetbrains.python.psi.types.TypeEvalContext;
 import groovyjarjarantlr4.v4.misc.OrderedHashMap;
 import org.apache.commons.lang.ArrayUtils;
-import org.fever.GotoPypendencyOrCodeHandler;
-import org.fever.ResolutionCache;
+import org.fever.fileresolver.DependencyInjectionFileResolverByClassName;
 import org.fever.utils.ClassArgumentParser;
 import org.fever.utils.IdentifierExtractor;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ClassArgumentFetcher {
     private static final int SELF_INDEX_IN_PARAMETER_LIST = 0;
-    private static final ResolutionCache.State resolutionCacheState = ApplicationManager.getApplication().getService(ResolutionCache.class).getState();
-
-    public static Collection<IdentifierItem> getFqnOfInitArguments(PyFile sourceCodeFile) {
+    public static Collection<IdentifierItem> getFqnOfInitArguments(PyClass originClass) {
         List<IdentifierItem> identifiers = new ArrayList<>();
+        PyFile sourceCodeFile = (PyFile) originClass.getContainingFile();
+        Project project = sourceCodeFile.getProject();
 
-        PyClass pyClass = sourceCodeFile.getTopLevelClasses().get(0);
-        TypeEvalContext context = TypeEvalContext.codeCompletion(
-                sourceCodeFile.getProject(),
-                sourceCodeFile.getContainingFile()
+        TypeEvalContext context = TypeEvalContext.userInitiated(
+                project,
+                sourceCodeFile
         );
-        Map<PyParameter, @Nullable PyClass> initParamsToClasses = getClassesFromInitParams(pyClass, context);
+        Map<PyParameter, @Nullable PyClass> initParamsToClasses = getClassesFromInitParams(originClass, context);
 
         for (Map.Entry<PyParameter, @Nullable PyClass> entry : initParamsToClasses.entrySet()) {
             PyParameter parameter = entry.getKey();
             PyClass parameterClass = entry.getValue();
+            String className = ClassArgumentParser.parse(parameter.getText());
+            List<String> implementationsClassNames = getAllImplementationsClassNames(parameterClass, className);
+            implementationsClassNames.add(className);
 
-            if (parameterClass == null) {
-                @Nullable String identifier = getIdentifierFromCache(sourceCodeFile, parameter);
-                identifiers.add(new IdentifierItem(identifier, null, parameter));
-                continue;
-            }
-
-            Collection<PyClass> allImplementations = PyClassInheritorsSearch.search(parameterClass, false).findAll();
-            if (allImplementations.isEmpty()) {
-                PsiFile dependencyInjectionFile = GotoPypendencyOrCodeHandler.getPypendencyDefinition(parameterClass.getContainingFile());
-                String parameterClassIdentifier = IdentifierExtractor.extractIdentifierFromDIFile(dependencyInjectionFile);
-                if (parameterClassIdentifier != null) {
-                    identifiers.add(new IdentifierItem(parameterClassIdentifier, parameterClass, parameter));
-                    continue;
-                }
-                identifiers.add(new IdentifierItem(null, parameterClass, parameter));
-                continue;
-            }
-
-            for (PyClass implementation : allImplementations) {
-                PsiFile dependencyInjectionFile = GotoPypendencyOrCodeHandler.getPypendencyDefinition(implementation.getOriginalElement().getContainingFile());
+            for (String implementationClassName : implementationsClassNames) {
+                PsiFile dependencyInjectionFile = DependencyInjectionFileResolverByClassName.resolve(project, implementationClassName);
                 String implementationIdentifier = IdentifierExtractor.extractIdentifierFromDIFile(dependencyInjectionFile);
                 IdentifierItem item = new IdentifierItem(implementationIdentifier, parameterClass, parameter);
                 if (!identifiers.contains(item)) {
@@ -66,17 +51,30 @@ public class ClassArgumentFetcher {
         return identifiers;
     }
 
-    private static String getIdentifierFromCache(PyFile sourceCodeFile, PyParameter parameter) {
-        @Nullable String argumentType = ClassArgumentParser.parse(parameter.getText());
-        if (argumentType == null || resolutionCacheState == null) {
-            return null;
+    @NotNull
+    private static List<String> getAllImplementationsClassNames(@Nullable PyClass parameterClass, String className) {
+        List<String> EMPTY_LIST = new ArrayList<>();
+
+
+        if (parameterClass == null) {
+            return EMPTY_LIST;
         }
-        String projectName = sourceCodeFile.getProject().getName();
-        return resolutionCacheState.getCachedIdentifierByClass(projectName, argumentType);
+
+        boolean classIsBuiltin = Character.isLowerCase(className.charAt(0));
+        if (classIsBuiltin) {
+            return EMPTY_LIST;
+        }
+
+        return PyClassInheritorsSearch
+                .search(parameterClass, false)
+                .findAll()
+                .stream()
+                .map(PyClass::getName)
+                .collect(Collectors.toList());
     }
 
-    private static Map<PyParameter, @Nullable PyClass> getClassesFromInitParams(PyClass pyClass, TypeEvalContext context) {
-        PyFunction initMethod = pyClass.findInitOrNew(false, context);
+    private static Map<PyParameter, @Nullable PyClass> getClassesFromInitParams(PyClass originClass, TypeEvalContext context) {
+        PyFunction initMethod = originClass.findInitOrNew(false, context);
         if (initMethod == null) {
             return new HashMap<>();
         }
@@ -90,7 +88,7 @@ public class ClassArgumentFetcher {
                 paramsToClasses.put(parameter, null);
                 continue;
             }
-            pyClass = ((PyClassType) argumentType).getPyClass();
+            PyClass pyClass = ((PyClassType) argumentType).getPyClass();
             paramsToClasses.put(parameter, pyClass);
         }
         return paramsToClasses;

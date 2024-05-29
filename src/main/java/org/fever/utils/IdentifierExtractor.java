@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 public class IdentifierExtractor {
     private static final String YAML_IDENTIFIER_GROUP_SELECTOR_REGEX = "^(\\S+):";
     private static final String PYTHON_IDENTIFIER_GROUP_SELECTOR_REGEX = "container_builder\\.set_definition\\(\\s+Definition\\(\\s*\"(\\S+)\",\\s*\"\\S+\"";
+    private static final String PYTHON_IDENTIFIER_GROUP_SELECTOR_DEFINED_MANUALLY_REGEX = "container(?:_builder)?\\.set\\(\\s*\"(\\S+)\"";
 
     private static @Nullable String extractGroupFromRegex(String text, String regex) {
         Matcher matcher = Pattern.compile(regex).matcher(text);
@@ -34,11 +35,11 @@ public class IdentifierExtractor {
         return null;
     }
 
-    private static Boolean isYamlFile(String extension) {
+    public static Boolean isYamlFile(String extension) {
         return extension.equals("yaml") || extension.equals("yml");
     }
 
-    private static Boolean isPythonFile(String extension) {
+    public static Boolean isPythonFile(String extension) {
         return extension.equals("py");
     }
 
@@ -48,6 +49,12 @@ public class IdentifierExtractor {
     }
 
     public static @Nullable String extractIdentifierFromPython(String fileContent) {
-        return extractGroupFromRegex(fileContent, PYTHON_IDENTIFIER_GROUP_SELECTOR_REGEX);
+        for (String regex : new String[]{PYTHON_IDENTIFIER_GROUP_SELECTOR_REGEX, PYTHON_IDENTIFIER_GROUP_SELECTOR_DEFINED_MANUALLY_REGEX}) {
+            String identifier = extractGroupFromRegex(fileContent, regex);
+            if (identifier != null) {
+                return identifier;
+            }
+        }
+        return null;
     }
 }
