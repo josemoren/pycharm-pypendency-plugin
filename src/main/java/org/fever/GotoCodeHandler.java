@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.psi.*;
 import com.intellij.util.SmartList;
-import org.fever.utils.SourceCodeFileResolver;
+import org.fever.fileresolver.SourceCodeFileResolverByFqn;
 import org.fever.utils.FqnExtractor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,7 +43,7 @@ public class GotoCodeHandler extends GotoTargetHandler {
             return null;
         }
 
-        PsiFile sourceCodeFile = SourceCodeFileResolver.fromFqn(fqn, dependencyInjectionFile.getManager());
+        PsiFile sourceCodeFile = SourceCodeFileResolverByFqn.resolve(fqn, dependencyInjectionFile.getManager());
         if (sourceCodeFile == null) {
             return null;
         }
