@@ -3,6 +3,7 @@ package org.fever;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.icons.AllIcons;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.python.psi.PyCallExpression;
@@ -48,8 +49,12 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
     }
 
     private boolean isInDependencyInjectionFolder(@NotNull PsiElement element) {
-        String path = element.getContainingFile().getOriginalFile().getContainingDirectory().toString();
-        return path.contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER);
+        PsiDirectory containingDirectory = element.getContainingFile().getOriginalFile().getContainingDirectory();
+        if (containingDirectory == null) {
+            return false;
+        }
+        String folderPath = containingDirectory.toString();
+        return folderPath.contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER);
     }
 
     private boolean isInContainerBuilderGetStatement(@NotNull PsiElement element) {
