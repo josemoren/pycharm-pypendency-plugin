@@ -44,21 +44,25 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
             return false;
         }
 
-        if (isInDependencyInjectionFolder(element)) {
-            return true;
-        }
-
-        PyCallExpression parentExpression = PsiTreeUtil.getParentOfType(element, PyCallExpression.class);
-        if (parentExpression == null) {
-            return false;
-        }
-
-        PyExpression callee = parentExpression.getCallee();
-        return callee != null && callee.getText().equals("container_builder.get");
+        return isInDependencyInjectionFolder(element) || isInContainerBuilderGetStatement(element);
     }
 
     private boolean isInDependencyInjectionFolder(@NotNull PsiElement element) {
         String path = element.getContainingFile().getOriginalFile().getContainingDirectory().toString();
         return path.contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER);
+    }
+
+    private boolean isInContainerBuilderGetStatement(@NotNull PsiElement element) {
+        PyCallExpression callExpression = PsiTreeUtil.getParentOfType(element, PyCallExpression.class);
+        if (callExpression == null) {
+            return false;
+        }
+
+        PyExpression callee = callExpression.getCallee();
+        if (callee == null) {
+            return false;
+        }
+
+        return callee.getText().equals("container.get");
     }
 }
