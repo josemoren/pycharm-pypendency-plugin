@@ -79,7 +79,7 @@ public class DependencyInjectionFileResolverByIdentifier {
     }
 
     private static @Nullable PsiFile resolveToDependencyInjectionManualDeclaration(String identifier, PsiManager psiManager) {
-        GlobalSearchScope scope = new DependencyInjectionSearchScope(psiManager.getProject());
+        GlobalSearchScope scope = DependencyInjectionSearchScope.projectScope(psiManager.getProject());
 
         Collection<VirtualFile> yamlDependencyInjectionFiles = FileBasedIndex.getInstance()
                 .getContainingFiles(
