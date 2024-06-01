@@ -50,7 +50,7 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
     public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
         PsiManager psiManager = PsiManager.getInstance(project);
         String projectName = project.getName();
-        GlobalSearchScope scope = new DependencyInjectionSearchScope(project);
+        GlobalSearchScope scope = DependencyInjectionSearchScope.projectScope(psiManager.getProject());
         int initialNumberOfCachedIdentifiers = resolutionCache.countIdentifiers(projectName);
 
         for (DependencyInjectionFileType fileType : FILE_TYPES) {
