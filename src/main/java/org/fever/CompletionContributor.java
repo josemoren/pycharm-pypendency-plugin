@@ -68,6 +68,6 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
             return false;
         }
 
-        return callee.getText().equals("container.get");
+        return callee.getText().equals("container_builder.get");
     }
 }
