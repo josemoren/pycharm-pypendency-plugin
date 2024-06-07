@@ -6,7 +6,7 @@ import com.intellij.psi.PsiReferenceProvider;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class ReferenceProvider extends PsiReferenceProvider {
-    protected static final String IDENTIFIER_REGEX_FOR_DI_FILES = "^@[a-z0-9_.]+\\.[A-Za-z0-9_]+$";
+    public static final String IDENTIFIER_REGEX_FOR_DI_FILES = "^@[a-z0-9_.]+\\.[A-Za-z0-9_]+$";
 
     @NotNull
     protected String cleanText(String text) {
