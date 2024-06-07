@@ -1,8 +1,9 @@
-package org.fever;
+package org.fever.fileresolver;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.search.GlobalSearchScope;
+import org.fever.GotoPypendencyOrCodeHandler;
 import org.jetbrains.annotations.NotNull;
 
 public class DependencyInjectionSearchScope extends GlobalSearchScope {
@@ -14,15 +15,11 @@ public class DependencyInjectionSearchScope extends GlobalSearchScope {
     @Override
     public boolean contains(@NotNull VirtualFile file) {
         String filePath = file.getPath();
-        return isPythonFile(file) && fileIsInDependencyInjectionFolder(filePath) && fileIsNotInExternalLibraries(filePath);
+        return fileIsInDependencyInjectionFolder(filePath) && fileIsNotInExternalLibraries(filePath);
     }
 
     private static boolean fileIsInDependencyInjectionFolder(String filePath) {
         return filePath.contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER);
-    }
-
-    private static boolean isPythonFile(@NotNull VirtualFile file) {
-        return file.getName().endsWith(".py");
     }
 
     private static boolean fileIsNotInExternalLibraries(String filePath) {
