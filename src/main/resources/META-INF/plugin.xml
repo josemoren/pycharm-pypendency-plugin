@@ -41,6 +41,8 @@
         <psi.referenceContributor language="yaml" implementation="org.fever.YamlReferenceContributor"/>
         <psi.referenceContributor language="Python" implementation="org.fever.PythonReferenceContributor"/>
         <applicationService serviceImplementation="org.fever.ResolutionCache"/>
+        <notificationGroup id="Pypendency notification" displayType="BALLOON"/>
+
     </extensions>
 
     <actions>
