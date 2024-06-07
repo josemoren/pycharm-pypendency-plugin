@@ -11,10 +11,8 @@ public class PythonDIFileTemplate implements DIFileTemplate {
             from pypendency.argument import Argument
             from pypendency.builder import ContainerBuilder
             from pypendency.definition import Definition
-                        
-            from django.conf import settings
-                        
-                        
+            
+            
             def load(container_builder: ContainerBuilder) -> None:
                 container_builder.set_definition(
                     Definition(
