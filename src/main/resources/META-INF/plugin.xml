@@ -33,17 +33,14 @@
     <depends>com.intellij.modules.python</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
 
-<!--    <extensions defaultExtensionNs="com.intellij">-->
-<!--        <completion.contributor language="yaml" implementationClass="org.fever.YamlCompletionContributor"/>-->
-<!--    </extensions>-->
-
     <extensions defaultExtensionNs="com.intellij">
         <psi.referenceContributor language="yaml" implementation="org.fever.YamlReferenceContributor"/>
         <psi.referenceContributor language="Python" implementation="org.fever.PythonReferenceContributor"/>
+        <completion.contributor language="yaml" implementationClass="org.fever.CompletionContributor"/>
+        <completion.contributor language="Python" implementationClass="org.fever.CompletionContributor"/>
         <applicationService serviceImplementation="org.fever.ResolutionCache"/>
         <backgroundPostStartupActivity implementation="org.fever.cachepopulator.PopulateCacheOnProjectStart"/>
         <notificationGroup id="Pypendency notification" displayType="BALLOON"/>
-
     </extensions>
 
     <actions>
