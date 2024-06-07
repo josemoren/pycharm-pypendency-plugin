@@ -89,7 +89,14 @@ public class GotoInjectedImplementationHandler extends GotoTargetHandler {
         }
 
         assert dependencyInjectionFile != null;
-        return SourceCodeFileResolverByFqn.resolve(identifier, dependencyInjectionFile.getManager());
+        PsiFile diFile = SourceCodeFileResolverByFqn.resolve(identifier, dependencyInjectionFile.getManager());
+        if (diFile == null) {
+            String message = "Could not find the source code file associated to the identifier \"" + identifier + "\".";
+            PypendencyNotifier.notify(project, message, NotificationType.ERROR);
+            return null;
+        }
+
+        return diFile;
     }
 
     private String getIdentifierFromPosition(@Nullable PsiFile dependencyInjectionFile, String targetClass, PyParameter[] initMethodParameters) {
