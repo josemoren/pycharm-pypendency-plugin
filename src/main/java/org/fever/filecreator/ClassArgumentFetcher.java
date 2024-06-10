@@ -68,7 +68,7 @@ public class ClassArgumentFetcher {
                 .findAll()
                 .stream()
                 .map(PyClass::getName)
-                .collect(Collectors.toList());
+                .toList();
 
         allClassNames.addAll(implementationClassNames);
         return allClassNames;
@@ -86,7 +86,7 @@ public class ClassArgumentFetcher {
             return new HashMap<>();
         }
 
-        List<PyParameter> dunderInitMethodParameters = Arrays.asList(initMethod.getParameterList().getParameters());
+        List<PyParameter> dunderInitMethodParameters = new ArrayList<>(Arrays.asList(initMethod.getParameterList().getParameters()));
         dunderInitMethodParameters.remove(SELF_INDEX_IN_PARAMETER_LIST);
         
         Map<PyParameter, @Nullable PyClass> paramsToClasses = new OrderedHashMap<>();
