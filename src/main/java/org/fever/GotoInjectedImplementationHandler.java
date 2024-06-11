@@ -12,10 +12,12 @@ import com.jetbrains.python.psi.PyFile;
 import com.jetbrains.python.psi.PyFunction;
 import com.jetbrains.python.psi.PyParameter;
 import com.jetbrains.python.psi.types.TypeEvalContext;
+import org.fever.fileresolver.DependencyInjectionFileResolverByIdentifier;
 import org.fever.fileresolver.DependencyInjectionFileResolverBySourceCodeFile;
 import org.fever.notifier.PypendencyNotifier;
 import org.fever.utils.ClassArgumentParser;
 import org.fever.fileresolver.SourceCodeFileResolverByFqn;
+import org.fever.utils.FqnExtractor;
 import org.fever.utils.PyClassUnderCaretFinder;
 import org.fever.utils.RegexMatcher;
 import org.jetbrains.annotations.NotNull;
@@ -73,6 +75,7 @@ public class GotoInjectedImplementationHandler extends GotoTargetHandler {
     private @Nullable PsiFile getInjectedImplementation(Editor editor, PsiElement elementUnderCaret) {
         PyFile currentFile = (PyFile) elementUnderCaret.getContainingFile();
         Project project = currentFile.getProject();
+        PsiManager manager = currentFile.getManager();
         TypeEvalContext context = TypeEvalContext.codeCompletion(
                 project,
                 currentFile.getContainingFile()
@@ -83,15 +86,15 @@ public class GotoInjectedImplementationHandler extends GotoTargetHandler {
         PyParameter[] initMethodParameters = initMethod.getParameterList().getParameters();
         String targetClass = elementUnderCaret.getText();
         PsiFile dependencyInjectionFile = DependencyInjectionFileResolverBySourceCodeFile.resolve(editor, editor.getProject(), currentFile);
-        String identifier = getIdentifierFromPosition(dependencyInjectionFile, targetClass, initMethodParameters);
-        if (identifier == null) {
+        String targetIdentifier = getIdentifierFromPosition(dependencyInjectionFile, targetClass, initMethodParameters);
+        if (targetIdentifier == null) {
             return null;
         }
 
-        assert dependencyInjectionFile != null;
-        PsiFile injectedImplementationSourceCodeFile = SourceCodeFileResolverByFqn.resolve(identifier, dependencyInjectionFile.getManager());
+        String targetFqn = getFqnFromIdentifier(manager, targetIdentifier);
+        PsiFile injectedImplementationSourceCodeFile = SourceCodeFileResolverByFqn.resolve(targetFqn, manager);
         if (injectedImplementationSourceCodeFile == null) {
-            String message = "Could not find the source code file associated to the identifier \"" + identifier + "\".";
+            String message = "Could not find the source code file associated to the FQN \"" + targetFqn + "\".";
             PypendencyNotifier.notify(project, message, NotificationType.ERROR);
             return null;
         }
@@ -140,6 +143,15 @@ public class GotoInjectedImplementationHandler extends GotoTargetHandler {
         }
 
         return argumentsInDIFile[targetClassIndexInInit];
+    }
+
+    private String getFqnFromIdentifier(PsiManager manager, String targetIdentifier) {
+        PsiFile targetDiFile = DependencyInjectionFileResolverByIdentifier.resolve(manager, targetIdentifier);
+        if (targetDiFile == null) {
+            return null;
+        }
+
+        return FqnExtractor.extractFqnFromDIFile(targetDiFile);
     }
 
     @Override
