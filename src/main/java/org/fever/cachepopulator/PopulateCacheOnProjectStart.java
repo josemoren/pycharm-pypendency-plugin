@@ -10,12 +10,11 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.python.PythonFileType;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
+import org.fever.GotoPypendencyOrCodeHandler;
 import org.fever.ResolutionCache;
-import org.fever.fileresolver.DependencyInjectionSearchScope;
 import org.fever.notifier.PypendencyNotifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +49,7 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
     public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
         PsiManager psiManager = PsiManager.getInstance(project);
         String projectName = project.getName();
-        GlobalSearchScope scope = DependencyInjectionSearchScope.projectScope(psiManager.getProject());
+        GlobalSearchScope scope = GlobalSearchScope.projectScope(psiManager.getProject());
         int initialNumberOfCachedIdentifiers = resolutionCache.countIdentifiers(projectName);
 
         for (DependencyInjectionFileType fileType : FILE_TYPES) {
@@ -83,6 +82,8 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
     }
 
     private static Collection<VirtualFile> getDependencyInjectionFiles(GlobalSearchScope scope, FileType fileType) {
-        return ReadAction.compute(() -> FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, fileType, scope));
+        return ReadAction.compute(() -> FileTypeIndex.getFiles(fileType, scope).stream()
+                .filter(file -> file.getPath().contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER))
+                .toList());
     }
 }
