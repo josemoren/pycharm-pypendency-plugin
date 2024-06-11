@@ -3,6 +3,7 @@ package org.fever.utils;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,28 +12,33 @@ public class IdentifierExtractor {
     private static final String PYTHON_IDENTIFIER_GROUP_SELECTOR_REGEX = "container_builder\\.set_definition\\(\\s+Definition\\(\\s*\"(\\S+)\",\\s*\"\\S+\"";
     private static final String PYTHON_IDENTIFIER_GROUP_SELECTOR_DEFINED_MANUALLY_REGEX = "container(?:_builder)?\\.set\\(\\s*\"(\\S+)\"";
 
-    private static @Nullable String extractGroupFromRegex(String text, String regex) {
+    private static @Nullable List<String> extractGroupMatchesFromRegex(String text, String regex) {
         Matcher matcher = Pattern.compile(regex).matcher(text);
-        return matcher.find() ? matcher.group(1) : null;
+        if (!matcher.find()) {
+            return null;
+        }
+        return matcher.results().map(matchResult -> matchResult.group(1)).toList();
     }
 
-    public static @Nullable String extractIdentifierFromDIFile(@Nullable PsiFile dependencyInjectionFile) {
+    public static List<String> extractIdentifiersFromDIFile(@Nullable PsiFile dependencyInjectionFile) {
+        List<String> EMPTY_LIST = List.of();
+
         if (dependencyInjectionFile == null) {
-            return null;
+            return EMPTY_LIST;
         }
         String extension = dependencyInjectionFile.getVirtualFile().getExtension();
         if (extension == null) {
-            return null;
+            return EMPTY_LIST;
         }
 
         String fileContent = dependencyInjectionFile.getText();
         if (isYamlFile(extension)) {
-            return extractIdentifierFromYaml(fileContent);
+            return extractIdentifiersFromYaml(fileContent);
         }
         if (isPythonFile(extension)) {
-            return extractIdentifierFromPython(fileContent);
+            return extractIdentifiersFromPython(fileContent);
         }
-        return null;
+        return EMPTY_LIST;
     }
 
     public static Boolean isYamlFile(String extension) {
@@ -44,15 +50,15 @@ public class IdentifierExtractor {
     }
 
 
-    public static @Nullable String extractIdentifierFromYaml(String fileContent) {
-        return extractGroupFromRegex(fileContent, YAML_IDENTIFIER_GROUP_SELECTOR_REGEX);
+    public static @Nullable List<String> extractIdentifiersFromYaml(String fileContent) {
+        return extractGroupMatchesFromRegex(fileContent, YAML_IDENTIFIER_GROUP_SELECTOR_REGEX);
     }
 
-    public static @Nullable String extractIdentifierFromPython(String fileContent) {
+    public static @Nullable List<String> extractIdentifiersFromPython(String fileContent) {
         for (String regex : new String[]{PYTHON_IDENTIFIER_GROUP_SELECTOR_REGEX, PYTHON_IDENTIFIER_GROUP_SELECTOR_DEFINED_MANUALLY_REGEX}) {
-            String identifier = extractGroupFromRegex(fileContent, regex);
-            if (identifier != null) {
-                return identifier;
+            List<String> identifiers = extractGroupMatchesFromRegex(fileContent, regex);
+            if (identifiers != null) {
+                return identifiers;
             }
         }
         return null;

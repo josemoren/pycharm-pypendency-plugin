@@ -66,9 +66,12 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
                     if (!matcher.reset(fileContent).find()) {
                         continue;
                     }
-                    String identifier = matcher.group(1);
-                    String cleanIdentifier = identifier.replaceAll("[\"'@,]", "");
-                    resolutionCache.setCachedResolution(projectName, cleanIdentifier, file.getCanonicalPath());
+
+                    matcher.results().forEach(match -> {
+                        String identifier = match.group(1);
+                        String cleanIdentifier = identifier.replaceAll("[\"'@,]", "");
+                        resolutionCache.setCachedResolution(projectName, cleanIdentifier, file.getCanonicalPath());
+                    });
                 }
             }
         }
