@@ -3,6 +3,7 @@ package org.fever.utils;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,10 +15,11 @@ public class IdentifierExtractor {
 
     private static @Nullable List<String> extractGroupMatchesFromRegex(String text, String regex) {
         Matcher matcher = Pattern.compile(regex).matcher(text);
-        if (!matcher.find()) {
-            return null;
+        List<String> allGroupMatches = new ArrayList<>();
+        while (matcher.find()) {
+            allGroupMatches.add(matcher.group(1));
         }
-        return matcher.results().map(matchResult -> matchResult.group(1)).toList();
+        return allGroupMatches.isEmpty() ? null : allGroupMatches;
     }
 
     public static List<String> extractIdentifiersFromDIFile(@Nullable PsiFile dependencyInjectionFile) {
