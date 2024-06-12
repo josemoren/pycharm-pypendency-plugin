@@ -82,9 +82,9 @@ public class DependencyInjectionFileResolverByIdentifier {
         GlobalSearchScope scope = GlobalSearchScope.projectScope(psiManager.getProject());
 
         Collection<VirtualFile> yamlDependencyInjectionFiles = FileTypeIndex.getFiles(YAMLFileType.YML, scope);
-        PsiFile yamlDdependencyInjectionFile = findDependencyInjectionFileInCollection(REGEX_FOR_YAML_DI_FILES, yamlDependencyInjectionFiles, psiManager, identifier);
-        if (yamlDdependencyInjectionFile != null) {
-            return yamlDdependencyInjectionFile;
+        PsiFile yamlDependencyInjectionFile = findDependencyInjectionFileInCollection(REGEX_FOR_YAML_DI_FILES, yamlDependencyInjectionFiles, psiManager, identifier);
+        if (yamlDependencyInjectionFile != null) {
+            return yamlDependencyInjectionFile;
         }
 
         Collection<VirtualFile> pythonDependencyInjectionFiles = FileTypeIndex.getFiles(PythonFileType.INSTANCE, scope).stream()
