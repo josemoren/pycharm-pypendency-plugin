@@ -4,11 +4,10 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.python.PythonFileType;
 import org.fever.ResolutionCache;
+import org.fever.filefinder.DependencyInjectionFilesFinder;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.yaml.YAMLFileType;
 
@@ -48,7 +47,6 @@ public class DependencyInjectionFileResolverByIdentifier {
         String projectName = manager.getProject().getName();
         String cachedFilePath = resolutionCache.getCachedResolution(projectName, identifier);
         if (cachedFilePath == null) {
-            LOG.info("No cached resolution found for " + identifier);
             return null;
         }
 
@@ -79,23 +77,15 @@ public class DependencyInjectionFileResolverByIdentifier {
     }
 
     private static @Nullable PsiFile resolveToDependencyInjectionManualDeclaration(String identifier, PsiManager psiManager) {
-        GlobalSearchScope scope = DependencyInjectionSearchScope.projectScope(psiManager.getProject());
+        GlobalSearchScope scope = GlobalSearchScope.projectScope(psiManager.getProject());
 
-        Collection<VirtualFile> yamlDependencyInjectionFiles = FileBasedIndex.getInstance()
-                .getContainingFiles(
-                        FileTypeIndex.NAME,
-                        YAMLFileType.YML,
-                        scope);
-        PsiFile yamlDdependencyInjectionFile = findDependencyInjectionFileInCollection(REGEX_FOR_YAML_DI_FILES, yamlDependencyInjectionFiles, psiManager, identifier);
-        if (yamlDdependencyInjectionFile != null) {
-            return yamlDdependencyInjectionFile;
+        Collection<VirtualFile> yamlDependencyInjectionFiles = DependencyInjectionFilesFinder.find(YAMLFileType.YML, scope);
+        PsiFile yamlDependencyInjectionFile = findDependencyInjectionFileInCollection(REGEX_FOR_YAML_DI_FILES, yamlDependencyInjectionFiles, psiManager, identifier);
+        if (yamlDependencyInjectionFile != null) {
+            return yamlDependencyInjectionFile;
         }
 
-        Collection<VirtualFile> pythonDependencyInjectionFiles = FileBasedIndex.getInstance()
-                .getContainingFiles(
-                        FileTypeIndex.NAME,
-                        PythonFileType.INSTANCE,
-                        scope);
+        Collection<VirtualFile> pythonDependencyInjectionFiles = DependencyInjectionFilesFinder.find(PythonFileType.INSTANCE, scope);
         for (String regex : REGEX_FOR_PYTHON_MANUALLY_SET_IDENTIFIERS) {
             PsiFile pythonDependencyInjectionFile = findDependencyInjectionFileInCollection(regex, pythonDependencyInjectionFiles, psiManager, identifier);
             if (pythonDependencyInjectionFile != null) {

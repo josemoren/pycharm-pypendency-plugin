@@ -8,14 +8,12 @@ import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.jetbrains.python.PythonFileType;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import org.fever.ResolutionCache;
-import org.fever.fileresolver.DependencyInjectionSearchScope;
+import org.fever.filefinder.DependencyInjectionFilesFinder;
 import org.fever.notifier.PypendencyNotifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,11 +48,11 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
     public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
         PsiManager psiManager = PsiManager.getInstance(project);
         String projectName = project.getName();
-        GlobalSearchScope scope = DependencyInjectionSearchScope.projectScope(psiManager.getProject());
+        GlobalSearchScope scope = GlobalSearchScope.projectScope(psiManager.getProject());
         int initialNumberOfCachedIdentifiers = resolutionCache.countIdentifiers(projectName);
 
         for (DependencyInjectionFileType fileType : FILE_TYPES) {
-            Collection<VirtualFile> dependencyInjectionFiles = getDependencyInjectionFiles(scope, fileType.fileType());
+            Collection<VirtualFile> dependencyInjectionFiles = ReadAction.compute(() -> DependencyInjectionFilesFinder.find(fileType.fileType(), scope));
             for (String regex : fileType.identifierRegexes()) {
                 Matcher matcher = Pattern.compile(regex).matcher("");
                 for (VirtualFile file : dependencyInjectionFiles) {
@@ -74,10 +72,6 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
         }
 
         return null;
-    }
-
-    private static Collection<VirtualFile> getDependencyInjectionFiles(GlobalSearchScope scope, FileType fileType) {
-        return ReadAction.compute(() -> FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, fileType, scope));
     }
 
     private static void cacheAllIdentifiersDefinedInFile(VirtualFile file, PsiFile psiFile, Matcher matcher, String projectName) {
