@@ -62,13 +62,7 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
                     if (psiFile == null) {
                         continue;
                     }
-                    String fileContent = ReadAction.compute(psiFile::getText);
-                    if (!matcher.reset(fileContent).find()) {
-                        continue;
-                    }
-                    String identifier = matcher.group(1);
-                    String cleanIdentifier = identifier.replaceAll("[\"'@,]", "");
-                    resolutionCache.setCachedResolution(projectName, cleanIdentifier, file.getCanonicalPath());
+                    cacheAllIdentifiersDefinedInFile(file, psiFile, matcher, projectName);
                 }
             }
         }
@@ -84,5 +78,15 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
 
     private static Collection<VirtualFile> getDependencyInjectionFiles(GlobalSearchScope scope, FileType fileType) {
         return ReadAction.compute(() -> FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, fileType, scope));
+    }
+
+    private static void cacheAllIdentifiersDefinedInFile(VirtualFile file, PsiFile psiFile, Matcher matcher, String projectName) {
+        String fileContent = ReadAction.compute(psiFile::getText);
+        matcher.reset(fileContent);
+        while (matcher.find()) {
+            String identifier = matcher.group(1);
+            String cleanIdentifier = identifier.replaceAll("[\"'@,]", "");
+            resolutionCache.setCachedResolution(projectName, cleanIdentifier, file.getCanonicalPath());
+        }
     }
 }

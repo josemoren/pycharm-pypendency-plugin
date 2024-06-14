@@ -114,10 +114,20 @@ public class DependencyInjectionFileResolverByIdentifier {
                 continue;
             }
             String diFileContent = diFile.getText();
-            if (matcher.reset(diFileContent).find() && matcher.group(1).equals(identifier)) {
+            if (identifierIsDefinedInFile(diFileContent, identifier, matcher)) {
                 return diFile;
             }
         }
         return null;
+    }
+
+    private static boolean identifierIsDefinedInFile(String diFileContent, String identifier, Matcher matcher) {
+        matcher.reset(diFileContent);
+        while (matcher.find()) {
+            if (matcher.group(1).equals(identifier)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
