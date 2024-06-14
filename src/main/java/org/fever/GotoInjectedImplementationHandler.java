@@ -13,7 +13,6 @@ import com.jetbrains.python.psi.PyFunction;
 import com.jetbrains.python.psi.PyParameter;
 import com.jetbrains.python.psi.types.TypeEvalContext;
 import org.fever.fileresolver.DependencyInjectionFileResolverByIdentifier;
-import org.fever.fileresolver.DependencyInjectionFileResolverBySourceCodeFile;
 import org.fever.notifier.PypendencyNotifier;
 import org.fever.utils.ClassArgumentParser;
 import org.fever.fileresolver.SourceCodeFileResolverByFqn;
@@ -85,7 +84,8 @@ public class GotoInjectedImplementationHandler extends GotoTargetHandler {
         assert initMethod != null;
         PyParameter[] initMethodParameters = initMethod.getParameterList().getParameters();
         String targetClass = elementUnderCaret.getText();
-        PsiFile dependencyInjectionFile = DependencyInjectionFileResolverBySourceCodeFile.resolve(editor, editor.getProject(), currentFile);
+        String fqn = PyClassUnderCaretFinder.find(editor, currentFile).getQualifiedName();
+        PsiFile dependencyInjectionFile = DependencyInjectionFileResolverByIdentifier.resolve(manager, fqn);
         String targetIdentifier = getIdentifierFromPosition(dependencyInjectionFile, targetClass, initMethodParameters);
         if (targetIdentifier == null) {
             return null;
