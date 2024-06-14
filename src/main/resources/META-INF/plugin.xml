@@ -54,5 +54,8 @@
         <action id="GotoCodeFromPypendency" class="org.fever.GotoCodeAction" text="Pypendency: Go to Code">
             <add-to-group group-id="PypendencyGroup" anchor="after" relative-to-action="GotoPypendency"/>
         </action>
+        <action id="GotoInjectedImplementation" class="org.fever.GotoInjectedImplementationAction" text="Pypendency: Go to Injected Implementation">
+            <add-to-group group-id="PypendencyGroup" anchor="after" relative-to-action="GotoCodeFromPypendency"/>
+        </action>
     </actions>
 </idea-plugin>
