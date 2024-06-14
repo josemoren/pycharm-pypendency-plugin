@@ -8,13 +8,12 @@ import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.jetbrains.python.PythonFileType;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
-import org.fever.GotoPypendencyOrCodeHandler;
 import org.fever.ResolutionCache;
+import org.fever.filefinder.DependencyInjectionFilesFinder;
 import org.fever.notifier.PypendencyNotifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,7 +52,7 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
         int initialNumberOfCachedIdentifiers = resolutionCache.countIdentifiers(projectName);
 
         for (DependencyInjectionFileType fileType : FILE_TYPES) {
-            Collection<VirtualFile> dependencyInjectionFiles = getDependencyInjectionFiles(scope, fileType.fileType());
+            Collection<VirtualFile> dependencyInjectionFiles = ReadAction.compute(() -> DependencyInjectionFilesFinder.find(fileType.fileType(), scope));
             for (String regex : fileType.identifierRegexes()) {
                 Matcher matcher = Pattern.compile(regex).matcher("");
                 for (VirtualFile file : dependencyInjectionFiles) {
@@ -79,11 +78,5 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
         }
 
         return null;
-    }
-
-    private static Collection<VirtualFile> getDependencyInjectionFiles(GlobalSearchScope scope, FileType fileType) {
-        return ReadAction.compute(() -> FileTypeIndex.getFiles(fileType, scope).stream()
-                .filter(file -> file.getPath().contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER))
-                .toList());
     }
 }
