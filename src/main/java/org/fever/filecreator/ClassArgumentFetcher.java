@@ -76,7 +76,12 @@ public class ClassArgumentFetcher {
 
     private static @NotNull IdentifierItem getIdentifierItem(String className, Project project, PyParameter parameter, PyClass parameterClass) {
         PsiFile dependencyInjectionFile = DependencyInjectionFileResolverByClassName.resolve(project, className);
-        String implementationIdentifier = IdentifierExtractor.extractIdentifierFromDIFile(dependencyInjectionFile);
+        List<String> identifiersInDIFile = IdentifierExtractor.extractIdentifiersFromDIFile(dependencyInjectionFile);
+
+        String implementationIdentifier = identifiersInDIFile.stream()
+                .filter(identifier -> identifier.endsWith("." + className))
+                .findFirst()
+                .orElse(null);
         return new IdentifierItem(implementationIdentifier, parameterClass, parameter);
     }
 
