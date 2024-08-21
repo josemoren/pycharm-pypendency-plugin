@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class DependencyInjectionFileResolverByClassName {
-    private static final ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
     private static final Logger LOG = Logger.getInstance("Pypendency");
 
     private static PsiFile resolveFromCache(PsiManager manager, String identifier) {
+        ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
         String projectName = manager.getProject().getName();
         String cachedFilePath = resolutionCache.getCachedResolution(projectName, identifier);
         if (cachedFilePath == null) {
@@ -32,6 +32,7 @@ public class DependencyInjectionFileResolverByClassName {
     }
 
     public static PsiFile resolve(Project project, String className) {
+        ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
         PsiManager psiManager = PsiManager.getInstance(project);
         String projectName = project.getName();
         Collection<String> possibleIdentifiers = resolutionCache.getCachedIdentifiersByClassName(projectName, className);
