@@ -41,11 +41,10 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
                     })
     };
 
-    private static final ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
-
     @Nullable
     @Override
     public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
+        ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
         PsiManager psiManager = PsiManager.getInstance(project);
         String projectName = project.getName();
         GlobalSearchScope scope = GlobalSearchScope.projectScope(psiManager.getProject());
@@ -75,6 +74,7 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
     }
 
     private static void cacheAllIdentifiersDefinedInFile(VirtualFile file, PsiFile psiFile, Matcher matcher, String projectName) {
+        ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
         String fileContent = ReadAction.compute(psiFile::getText);
         matcher.reset(fileContent);
         while (matcher.find()) {
