@@ -5,6 +5,7 @@ import com.intellij.codeInsight.generation.actions.PresentableActionHandlerBased
 import com.intellij.lang.CodeInsightActions;
 import com.intellij.lang.LanguageExtension;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataKey;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +21,7 @@ public class GotoPypendencyOrCodeAction extends PresentableActionHandlerBasedAct
     @Override
     @NotNull
     protected CodeInsightActionHandler getHandler(){
-        PsiFile file = (PsiFile) this.anActionEvent.getDataContext().getData("psi.File");
+        PsiFile file = this.anActionEvent.getData(DataKey.create("psi.File"));
         assert file != null;
         if (isDependencyInjectionFile(file)) {
             return new GotoCodeHandler(this.anActionEvent);
