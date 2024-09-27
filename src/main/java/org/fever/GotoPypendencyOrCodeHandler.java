@@ -34,8 +34,6 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
     public static final String DEPENDENCY_INJECTION_FOLDER = "/_dependency_injection/";
     AnActionEvent anActionEvent;
 
-    private static final ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
-
     public GotoPypendencyOrCodeHandler(AnActionEvent anActionEvent) {
         super();
         this.anActionEvent = anActionEvent;
@@ -134,6 +132,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
         }
 
         String createdFilePath = newFile.getVirtualFile().getCanonicalPath();
+        ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
         resolutionCache.setCachedResolution(file.getProject().getName(), fqn, createdFilePath);
         Project fileProject = file.getProject();
         FileEditorManager.getInstance(fileProject).openFile(newFile.getVirtualFile(), true);

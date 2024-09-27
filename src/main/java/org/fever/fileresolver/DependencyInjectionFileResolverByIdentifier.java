@@ -21,7 +21,6 @@ public class DependencyInjectionFileResolverByIdentifier {
             "container_builder\\.set_definition\\(\\s*Definition\\(\\s*\"(\\S+)\"",
     };
     private static final String REGEX_FOR_YAML_DI_FILES = "^(\\S+):\n\\s*fqn:";
-    private static final ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
     private static final Logger LOG = Logger.getInstance("Pypendency");
 
     /**
@@ -44,6 +43,7 @@ public class DependencyInjectionFileResolverByIdentifier {
     }
 
     private static PsiFile resolveFromCache(PsiManager manager, String identifier) {
+        ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
         String projectName = manager.getProject().getName();
         String cachedFilePath = resolutionCache.getCachedResolution(projectName, identifier);
         if (cachedFilePath == null) {
@@ -62,6 +62,7 @@ public class DependencyInjectionFileResolverByIdentifier {
 
     @Nullable
     private static PsiFile resolveManuallyAndStoreInCache(PsiManager psiManager, String identifier) {
+        ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
         PsiFile file = resolveToDependencyInjectionManualDeclaration(identifier, psiManager);
 
         if (file == null) {

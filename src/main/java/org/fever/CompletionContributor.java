@@ -15,12 +15,12 @@ import java.util.List;
 
 public class CompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
     private static final String INTELLIJ_DEFAULT_STRING = "IntellijIdeaRulezzz "; // https://intellij-support.jetbrains.com/hc/en-us/community/posts/4411826210066-How-to-deal-with-INTELLIJIDEARULEZZZ-in-Reference-Code-Completion
-    private static final ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
     public CompletionContributor() {
     }
 
     @Override
     public void fillCompletionVariants(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
+        ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
         PsiElement element = parameters.getPosition().getContainingFile().findElementAt(parameters.getOffset());
         if (!isDependencyInjectionStatement(element)) {
             return;
