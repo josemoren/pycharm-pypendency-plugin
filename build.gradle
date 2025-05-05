@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.fever'
-version '2024.3.0'
+version '2024.3.1'
 
 repositories {
     mavenCentral()
@@ -25,5 +25,4 @@ intellij {
 patchPluginXml {
     changeNotes="Version 2024.3<br>Go to pypendency."
     sinceBuild='231'
-    untilBuild='251.*'
 }
