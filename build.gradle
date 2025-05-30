@@ -1,6 +1,11 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '1.13.0'
+    id 'org.jetbrains.intellij' version '1.17.4'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 group 'org.fever'
