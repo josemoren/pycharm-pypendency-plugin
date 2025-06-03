@@ -36,7 +36,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <psi.referenceContributor language="yaml" implementation="org.fever.YamlReferenceContributor"/>
         <psi.referenceContributor language="Python" implementation="org.fever.PythonReferenceContributor"/>
-        <completion.contributor language="yaml" implementationClass="org.fever.CompletionContributor"/>π
+        <completion.contributor language="yaml" implementationClass="org.fever.CompletionContributor"/>
         <completion.contributor language="Python" implementationClass="org.fever.CompletionContributor"/>
         <applicationService serviceImplementation="org.fever.ResolutionCache"/>
         <backgroundPostStartupActivity implementation="org.fever.cachepopulator.PopulateCacheOnProjectStart"/>
