@@ -25,4 +25,5 @@ intellij {
 patchPluginXml {
     changeNotes="Version 2024.3<br>Go to pypendency."
     sinceBuild='231'
+    untilBuild=provider{null}
 }
