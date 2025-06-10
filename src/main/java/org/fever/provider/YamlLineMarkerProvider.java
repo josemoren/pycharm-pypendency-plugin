@@ -4,20 +4,29 @@ import com.intellij.codeInsight.daemon.GutterName;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.fever.GotoPypendencyOrCodeHandler;
 import org.fever.fileresolver.SourceCodeFileResolverByFqn;
 import org.fever.utils.FqnExtractor;
+import org.fever.utils.IconCreator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+
 public class YamlLineMarkerProvider extends LineMarkerProviderDescriptor {
+    private static final Icon ICON = IconCreator.create("icons/goToSource.svg");
+
     @Override
     public @Nullable @GutterName String getName() {
         return "Go to python class";
+    }
+
+    @Override
+    public @Nullable Icon getIcon() {
+        return ICON;
     }
 
     @Override
@@ -43,7 +52,7 @@ public class YamlLineMarkerProvider extends LineMarkerProviderDescriptor {
         }
 
         NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder
-                .create(AllIcons.Graph.Layout)
+                .create(ICON)
                 .setTarget(sourceCodeFile)
                 .setTooltipText("Navigate to Python class")
                 .setAlignment(GutterIconRenderer.Alignment.CENTER);
