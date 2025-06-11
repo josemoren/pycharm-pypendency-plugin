@@ -44,12 +44,11 @@ public class PythonLineMarkerProvider extends LineMarkerProviderDescriptor {
             return null;
         }
 
-        NavigationGutterIconBuilder<PsiElement> builder = NavigationGutterIconBuilder
+        return NavigationGutterIconBuilder
                 .create(ICON)
                 .setTarget(diFile)
                 .setTooltipText("Navigate to dependency injection file")
-                .setAlignment(GutterIconRenderer.Alignment.CENTER);
-
-        return builder.createLineMarkerInfo(pyClass);
+                .setAlignment(GutterIconRenderer.Alignment.CENTER)
+                .createLineMarkerInfo(pyClass);
     }
 }
