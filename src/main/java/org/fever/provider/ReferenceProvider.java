@@ -1,4 +1,4 @@
-package org.fever;
+package org.fever.provider;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;

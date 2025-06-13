@@ -1,7 +1,8 @@
-package org.fever;
+package org.fever.provider;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
+import org.fever.PsiReference;
 import org.jetbrains.annotations.NotNull;
 
 

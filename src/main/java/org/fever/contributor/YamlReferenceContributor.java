@@ -1,7 +1,8 @@
-package org.fever;
+package org.fever.contributor;
 
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
+import org.fever.provider.YamlReferenceProvider;
 
 public class YamlReferenceContributor extends PsiReferenceContributor {
     @Override
