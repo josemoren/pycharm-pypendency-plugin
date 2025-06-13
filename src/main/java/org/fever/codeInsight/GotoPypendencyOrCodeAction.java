@@ -1,4 +1,4 @@
-package org.fever;
+package org.fever.codeInsight;
 
 import com.intellij.codeInsight.CodeInsightActionHandler;
 import com.intellij.codeInsight.generation.actions.PresentableActionHandlerBasedAction;
@@ -10,7 +10,7 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
-import static org.fever.GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER;
+import static org.fever.codeInsight.GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER;
 
 public class GotoPypendencyOrCodeAction extends PresentableActionHandlerBasedAction {
     public static final String PRESENTATION_TEXT = "Pypendency: Go to/create DI file";

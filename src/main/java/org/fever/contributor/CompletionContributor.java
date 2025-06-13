@@ -1,4 +1,4 @@
-package org.fever;
+package org.fever.contributor;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
@@ -8,6 +8,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.jetbrains.python.psi.PyCallExpression;
 import com.jetbrains.python.psi.PyExpression;
+import org.fever.ResolutionCache;
+import org.fever.codeInsight.GotoPypendencyOrCodeHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

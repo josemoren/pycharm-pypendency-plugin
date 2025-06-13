@@ -1,4 +1,4 @@
-package org.fever;
+package org.fever.codeInsight;
 
 import com.intellij.codeInsight.CodeInsightActionHandler;
 import com.intellij.codeInsight.actions.BaseCodeInsightAction;

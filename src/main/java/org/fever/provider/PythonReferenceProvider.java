@@ -1,4 +1,4 @@
-package org.fever;
+package org.fever.provider;
 
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -7,9 +7,10 @@ import com.intellij.util.ProcessingContext;
 import com.jetbrains.python.psi.PyCallExpression;
 import com.jetbrains.python.psi.PyReferenceExpression;
 import com.jetbrains.python.psi.impl.PyReferenceExpressionImpl;
+import org.fever.PsiReference;
 import org.jetbrains.annotations.NotNull;
 
-import static org.fever.GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER;
+import static org.fever.codeInsight.GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER;
 
 
 public class PythonReferenceProvider extends ReferenceProvider {

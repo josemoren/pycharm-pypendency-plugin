@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-import static org.fever.GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER;
+import static org.fever.codeInsight.GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER;
 
 public class YamlLineMarkerProvider extends LineMarkerProviderDescriptor {
     private static final Icon ICON = IconCreator.create("icons/goToSource.svg");

@@ -5,7 +5,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.jetbrains.python.PythonFileType;
-import org.fever.GotoPypendencyOrCodeHandler;
+import org.fever.codeInsight.GotoPypendencyOrCodeHandler;
 
 import java.util.Collection;
 import java.util.stream.Stream;
