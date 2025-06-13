@@ -1,4 +1,4 @@
-package org.fever;
+package org.fever.codeInsight;
 
 import com.intellij.codeInsight.navigation.GotoTargetHandler;
 import com.intellij.openapi.actionSystem.AnActionEvent;

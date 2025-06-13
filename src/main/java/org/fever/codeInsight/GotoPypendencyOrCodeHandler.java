@@ -1,4 +1,4 @@
-package org.fever;
+package org.fever.codeInsight;
 
 import com.intellij.codeInsight.navigation.GotoTargetHandler;
 import com.intellij.icons.AllIcons;
@@ -15,6 +15,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.util.SmartList;
 import com.jetbrains.python.psi.PyClass;
+import org.fever.ResolutionCache;
 import org.fever.filecreator.*;
 import org.fever.fileresolver.DependencyInjectionFileResolverByIdentifier;
 import org.fever.utils.PyClassUnderCaretFinder;
