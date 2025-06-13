@@ -41,6 +41,8 @@
         <applicationService serviceImplementation="org.fever.ResolutionCache"/>
         <backgroundPostStartupActivity implementation="org.fever.cachepopulator.PopulateCacheOnProjectStart"/>
         <notificationGroup id="Pypendency notification" displayType="BALLOON"/>
+        <codeInsight.lineMarkerProvider language="Python" implementationClass="org.fever.provider.PythonLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="yaml" implementationClass="org.fever.provider.YamlLineMarkerProvider"/>
     </extensions>
 
     <actions>
