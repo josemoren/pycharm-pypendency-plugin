@@ -106,10 +106,8 @@ public class CreateDILineMarkerProvider implements LineMarkerProvider {
 
             if ("YAML".equals(selectedValue)) {
                 diFile = DIFileCreator.create((PyClass) element, classFqn, DIFileType.YAML);
-                System.out.println("Creating YAML DI file for class: " + classFqn);
             } else if ("Python".equals(selectedValue)) {
                 diFile = DIFileCreator.create((PyClass) element, classFqn, DIFileType.PYTHON);
-                System.out.println("Creating Python DI file for class: " + classFqn);
             }
 
             if (diFile == null) {
