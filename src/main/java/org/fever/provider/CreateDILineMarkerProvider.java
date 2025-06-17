@@ -14,7 +14,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.awt.RelativePoint;
 import com.jetbrains.python.psi.PyClass;
-import org.fever.filecreator.DIFileCreator;
 import org.fever.filecreator.DIFileType;
 import org.fever.fileresolver.DependencyInjectionFileResolverByIdentifier;
 import org.fever.utils.DIFileOpener;
@@ -66,21 +65,19 @@ public class CreateDILineMarkerProvider implements LineMarkerProvider {
 
             assert classFqn != null;
             JBPopupFactory.getInstance()
-                    .createListPopup(new DICreationPopupStep(element, classFqn))
+                    .createListPopup(new DICreationPopupStep(element))
                     .show(new RelativePoint(e));
         }
     }
 
     private static class DICreationPopupStep extends BaseListPopupStep<String> {
         private final PsiElement element;
-        private final String classFqn;
         private static final String TITLE = "Choose DI File Format";
         private static final String[] FORMATS = {"YAML", "Python"};
 
-        public DICreationPopupStep(@NotNull PsiElement element, @NotNull String classFqn) {
+        public DICreationPopupStep(@NotNull PsiElement element) {
             super(TITLE, FORMATS);
             this.element = element;
-            this.classFqn = classFqn;
         }
 
         @Override
@@ -90,26 +87,14 @@ public class CreateDILineMarkerProvider implements LineMarkerProvider {
 
         @Override
         public @Nullable PopupStep<?> onChosen(String selectedValue, boolean finalChoice) {
-            PsiFile diFile = null;
-
-            if ("YAML".equals(selectedValue)) {
-                diFile = DIFileCreator.create((PyClass) element, classFqn, DIFileType.YAML);
-            } else if ("Python".equals(selectedValue)) {
-                diFile = DIFileCreator.create((PyClass) element, classFqn, DIFileType.PYTHON);
-            }
-
-            if (diFile == null) {
-                return FINAL_CHOICE;
-            }
+            DIFileType type = "YAML".equals(selectedValue) ? DIFileType.YAML : DIFileType.PYTHON;
 
             Editor editor = FileEditorManager.getInstance(element.getProject()).getSelectedTextEditor();
             if (editor == null) {
                 return FINAL_CHOICE;
             }
 
-            DIFileType type = "YAML".equals(selectedValue) ? DIFileType.YAML : DIFileType.PYTHON;
             DIFileOpener.createAndOpenDIFIle(editor, element.getContainingFile(), type);
-
             return FINAL_CHOICE;
         }
     }
