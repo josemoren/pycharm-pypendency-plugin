@@ -37,8 +37,7 @@ public class YamlLineMarkerProvider extends LineMarkerProviderDescriptor {
             return null;
         }
 
-        PsiElement firstElement = file.findElementAt(0);
-        if (psiElement != firstElement) {
+        if (!"fqn".equals(psiElement.getText())) {
             return null;
         }
 
