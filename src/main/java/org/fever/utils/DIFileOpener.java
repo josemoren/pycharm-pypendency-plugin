@@ -10,6 +10,7 @@ import com.jetbrains.python.psi.PyClass;
 import org.fever.ResolutionCache;
 import org.fever.filecreator.DIFileCreator;
 import org.fever.filecreator.DIFileType;
+import org.jetbrains.annotations.Nullable;
 
 public class DIFileOpener {
     public static void open(Editor editor, PsiFile file, DIFileType type) {
@@ -19,6 +20,18 @@ public class DIFileOpener {
         }
 
         String fqn = targetPyClass.getQualifiedName();
+        PsiFile newFile = getPsiFile(file, type, targetPyClass, fqn);
+
+        assert newFile != null;
+        String createdFilePath = newFile.getVirtualFile().getCanonicalPath();
+        ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
+        Project fileProject = file.getProject();
+
+        resolutionCache.setCachedResolution(fileProject.getName(), fqn, createdFilePath);
+        FileEditorManager.getInstance(fileProject).openFile(newFile.getVirtualFile(), true);
+    }
+
+    private static @Nullable PsiFile getPsiFile(PsiFile file, DIFileType type, PyClass targetPyClass, String fqn) {
         PsiDirectory directory = PypendencyDirectoryCreator.forFile(file);
         PsiFile dependencyInjectionFile = DIFileCreator.create(targetPyClass, fqn, type);
         PsiFile newFile;
@@ -29,12 +42,6 @@ public class DIFileOpener {
             newFile = directory.findFile(dependencyInjectionFile.getName());
         }
 
-        assert newFile != null;
-        String createdFilePath = newFile.getVirtualFile().getCanonicalPath();
-        ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
-        Project fileProject = file.getProject();
-
-        resolutionCache.setCachedResolution(fileProject.getName(), fqn, createdFilePath);
-        FileEditorManager.getInstance(fileProject).openFile(newFile.getVirtualFile(), true);
+        return newFile;
     }
 }
