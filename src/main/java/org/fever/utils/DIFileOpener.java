@@ -11,9 +11,8 @@ import org.fever.ResolutionCache;
 import org.fever.filecreator.DIFileCreator;
 import org.fever.filecreator.DIFileType;
 
-// Todo: review if this class name is correct or should be split into multiple classes
 public class DIFileOpener {
-    public static void createAndOpenDIFIle(Editor editor, PsiFile file, DIFileType type) {
+    public static void open(Editor editor, PsiFile file, DIFileType type) {
         PyClass targetPyClass = PyClassUnderCaretFinder.find(editor, file);
         if (targetPyClass == null) {
             return;

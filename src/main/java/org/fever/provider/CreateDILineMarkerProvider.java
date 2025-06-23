@@ -94,7 +94,7 @@ public class CreateDILineMarkerProvider implements LineMarkerProvider {
                 return FINAL_CHOICE;
             }
 
-            DIFileOpener.createAndOpenDIFIle(editor, element.getContainingFile(), type);
+            DIFileOpener.open(editor, element.getContainingFile(), type);
             return FINAL_CHOICE;
         }
     }

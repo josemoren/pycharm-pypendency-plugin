@@ -86,7 +86,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
 
             @Override
             public void execute() {
-                DIFileOpener.createAndOpenDIFIle(editor, file, DIFileType.YAML);
+                DIFileOpener.open(editor, file, DIFileType.YAML);
             }
         });
 
@@ -104,7 +104,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
 
             @Override
             public void execute() {
-                DIFileOpener.createAndOpenDIFIle(editor, file, DIFileType.PYTHON);
+                DIFileOpener.open(editor, file, DIFileType.PYTHON);
             }
         });
 
