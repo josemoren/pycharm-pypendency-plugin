@@ -82,7 +82,7 @@ public class CreateDILineMarkerProvider implements LineMarkerProvider {
 
         @Override
         public @NotNull String getTextFor(String value) {
-            return value + " format";
+            return value;
         }
 
         @Override
