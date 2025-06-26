@@ -38,15 +38,11 @@ dependencies {
 intellijPlatform {
     pluginConfiguration {
         id = 'org.fever.pypendency'
-        name = 'pycharm-pypendency'
-        changeNotes =
-                """
-Version 2024.3<br>Go to pypendency.
-""".stripIndent()
+        name = 'Pypendency'
+        changeNotes = file('change-notes.txt').text
         ideaVersion {
             sinceBuild = '231'
             untilBuild = provider { null }
         }
     }
 }
-
