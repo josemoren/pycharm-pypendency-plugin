@@ -1,6 +1,8 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '1.17.4'
+    id 'org.jetbrains.intellij.platform' version '2.6.0'
 }
 
 java {
@@ -13,22 +15,38 @@ version '2025.1.2'
 
 repositories {
     mavenCentral()
+
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
 //    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    intellijPlatform {
+        def version = providers.gradleProperty("platformVersion")
+        create(IntelliJPlatformType.PyCharmProfessional, version)
+
+        bundledPlugin("org.jetbrains.plugins.yaml")
+        // https://plugins.jetbrains.com/docs/intellij/pycharm.html#python-plugins
+        bundledPlugin("PythonCore") // For PyCharm Community
+        bundledPlugin("Pythonid") // For PyCharm Professional
+    }
 }
 
-// See https://github.com/JetBrains/gradle-intellij-plugin/
-intellij {
-    version='2023.1+'
-    type='PY'
-    plugins=['yaml', 'Pythonid']
-    pluginName='pycharm-pypendency'
-    downloadSources=false
+intellijPlatform {
+    pluginConfiguration {
+        id = 'org.fever.pypendency'
+        name = 'pycharm-pypendency'
+        changeNotes =
+                """
+Version 2024.3<br>Go to pypendency.
+""".stripIndent()
+        ideaVersion {
+            sinceBuild = '231'
+            untilBuild = provider { null }
+        }
+    }
 }
-patchPluginXml {
-    changeNotes="Version 2024.3<br>Go to pypendency."
-    sinceBuild='231'
-    untilBuild=provider{null}
-}
+
