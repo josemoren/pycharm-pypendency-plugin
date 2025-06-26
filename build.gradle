@@ -11,7 +11,7 @@ java {
 }
 
 group 'org.fever'
-version '2025.1.2'
+version file('VERSION').text.strip()
 
 repositories {
     mavenCentral()
