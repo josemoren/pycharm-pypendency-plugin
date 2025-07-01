@@ -2,22 +2,16 @@ package org.fever.codeInsight;
 
 import com.intellij.codeInsight.navigation.GotoTargetHandler;
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.util.DirectoryUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VfsUtilCore;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.util.SmartList;
 import com.jetbrains.python.psi.PyClass;
-import org.fever.ResolutionCache;
-import org.fever.filecreator.*;
+import org.fever.filecreator.DIFileType;
 import org.fever.fileresolver.DependencyInjectionFileResolverByIdentifier;
+import org.fever.utils.DIFileOpener;
 import org.fever.utils.PyClassUnderCaretFinder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,7 +55,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
             return getGotoDataForExistingPypendency(pyClassUnderCaret, pypendencyDefinitionFile);
         }
 
-        return getGotoDataForNewPypendency(editor, file, pyClassUnderCaret, this);
+        return getGotoDataForNewPypendency(editor, file, pyClassUnderCaret);
     }
 
     @NotNull
@@ -75,8 +69,9 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
     }
 
     @NotNull
-    private GotoTargetHandler.GotoData getGotoDataForNewPypendency(Editor editor, PsiFile file, PsiElement pyClassUnderCaret, GotoPypendencyOrCodeHandler self) {
+    private GotoTargetHandler.GotoData getGotoDataForNewPypendency(Editor editor, PsiFile file, PsiElement pyClassUnderCaret) {
         List<AdditionalAction> actions = new SmartList<>();
+
         actions.add(new AdditionalAction() {
             @NotNull
             @Override
@@ -91,7 +86,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
 
             @Override
             public void execute() {
-                self.createAndOpenDIFIle(editor, file, DIFileType.YAML);
+                DIFileOpener.open(editor, file, DIFileType.YAML);
             }
         });
 
@@ -99,7 +94,7 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
             @NotNull
             @Override
             public String getText() {
-                return  CREATE_NEW_PYTHON_DEFINITION;
+                return CREATE_NEW_PYTHON_DEFINITION;
             }
 
             @Override
@@ -109,67 +104,11 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
 
             @Override
             public void execute() {
-                self.createAndOpenDIFIle(editor, file, DIFileType.PYTHON);
+                DIFileOpener.open(editor, file, DIFileType.PYTHON);
             }
         });
 
         return new GotoData(pyClassUnderCaret, PsiElement.EMPTY_ARRAY, actions);
-    }
-
-    private void createAndOpenDIFIle(Editor editor, PsiFile file, DIFileType type) {
-        PsiDirectory directory = makePypendencyDirectoryForFile(file);
-        PyClass targetPyClass = PyClassUnderCaretFinder.find(editor, file);
-        if (targetPyClass == null) {
-            return;
-        }
-        String fqn = targetPyClass.getQualifiedName();
-        PsiFile dependencyInjectionFile = DIFileCreator.create(targetPyClass, fqn, type);
-
-        PsiFile newFile;
-        try {
-            newFile = WriteAction.compute(() -> (PsiFile) directory.add(dependencyInjectionFile));
-        } catch (Exception e) {
-            newFile = directory.findFile(dependencyInjectionFile.getName());
-        }
-
-        String createdFilePath = newFile.getVirtualFile().getCanonicalPath();
-        ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
-        resolutionCache.setCachedResolution(file.getProject().getName(), fqn, createdFilePath);
-        Project fileProject = file.getProject();
-        FileEditorManager.getInstance(fileProject).openFile(newFile.getVirtualFile(), true);
-
-    }
-    private PsiDirectory makePypendencyDirectoryForFile(PsiFile file) {
-        VirtualFile diPath = getDIPath(file);
-        assert diPath != null;
-
-        PsiDirectory fileParent = file.getParent();
-        assert fileParent != null;
-
-        VirtualFile parentVirtualFile = fileParent.getVirtualFile();
-        String relativePath = VfsUtilCore.getRelativePath(parentVirtualFile, diPath.getParent());
-        String diNewPath = diPath.getCanonicalPath() + "/" + relativePath;
-
-        Project fileProject = file.getProject();
-        return WriteAction.compute(
-                () -> DirectoryUtil.mkdirs(PsiManager.getInstance(fileProject), diNewPath)
-        );
-    }
-
-    private static @Nullable VirtualFile getDIPath(@NotNull PsiFile file) {
-        PsiDirectory directory = file.getParent();
-
-        while (directory != null) {
-            String directoryPath = directory.getVirtualFile().getCanonicalPath();
-
-            if (FileUtil.exists(directoryPath + DEPENDENCY_INJECTION_FOLDER)) {
-                return LocalFileSystem.getInstance().findFileByPath(directoryPath + DEPENDENCY_INJECTION_FOLDER);
-            }
-
-            directory = directory.getParent();
-        }
-
-        return null;
     }
 
     @Override
