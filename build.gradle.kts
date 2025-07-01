@@ -1,8 +1,8 @@
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 
 plugins {
-    id 'java'
-    id 'org.jetbrains.intellij.platform' version '2.6.0'
+    id("java")
+    id("org.jetbrains.intellij.platform") version "2.6.0"
 }
 
 java {
@@ -10,8 +10,8 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-group 'org.fever'
-version file('VERSION').text.strip()
+group = "org.fever"
+version = readFile("VERSION")
 
 repositories {
     mavenCentral()
@@ -22,10 +22,10 @@ repositories {
 }
 
 dependencies {
-//    testCompile group: 'junit', name: 'junit', version: '4.12'
+    // testImplementation("junit:junit:4.12")
 
     intellijPlatform {
-        def version = providers.gradleProperty("platformVersion")
+        val version = providers.gradleProperty("platformVersion")
         create(IntelliJPlatformType.PyCharmProfessional, version)
 
         bundledPlugin("org.jetbrains.plugins.yaml")
@@ -37,12 +37,16 @@ dependencies {
 
 intellijPlatform {
     pluginConfiguration {
-        id = 'org.fever.pypendency'
-        name = 'Pypendency'
-        changeNotes = file('change-notes.txt').text
+        id = "org.fever.pypendency"
+        name = "Pypendency"
+        changeNotes = readFile("whats-new.txt").replace("{{version}}", project.version.toString())
         ideaVersion {
-            sinceBuild = '231'
+            sinceBuild = "231"
             untilBuild = provider { null }
         }
     }
+}
+
+fun readFile(name: String): String {
+    return file(name).readText().trim()
 }
