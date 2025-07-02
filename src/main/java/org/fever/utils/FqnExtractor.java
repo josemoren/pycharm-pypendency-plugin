@@ -19,6 +19,7 @@ public class FqnExtractor {
         if (dependencyInjectionFile == null) {
             return null;
         }
+
         String extension = dependencyInjectionFile.getVirtualFile().getExtension();
         if (extension == null) {
             return null;
@@ -28,9 +29,11 @@ public class FqnExtractor {
         if (isYamlFile(extension)) {
             return FqnExtractor.extractFqnFromYaml(fileContent);
         }
+
         if (isPythonFile(extension)) {
             return FqnExtractor.extractFqnFromPython(fileContent);
         }
+
         return null;
     }
 

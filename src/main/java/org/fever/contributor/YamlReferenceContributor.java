@@ -1,7 +1,8 @@
 package org.fever.contributor;
 
 import com.intellij.patterns.PlatformPatterns;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiReferenceContributor;
+import com.intellij.psi.PsiReferenceRegistrar;
 import org.fever.provider.YamlReferenceProvider;
 
 public class YamlReferenceContributor extends PsiReferenceContributor {
@@ -9,8 +10,7 @@ public class YamlReferenceContributor extends PsiReferenceContributor {
     public void registerReferenceProviders(PsiReferenceRegistrar registrar) {
         registrar.registerReferenceProvider(
                 PlatformPatterns.psiElement()
-                .inFile(PlatformPatterns.psiFile()
-                ),
+                                .inFile(PlatformPatterns.psiFile()),
                 new YamlReferenceProvider()
         );
     }
