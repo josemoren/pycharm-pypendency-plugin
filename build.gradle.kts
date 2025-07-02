@@ -40,6 +40,7 @@ intellijPlatform {
         id = "org.fever.pypendency"
         name = "Pypendency"
         changeNotes = readFile("whats-new.txt").replace("{{version}}", project.version.toString())
+
         ideaVersion {
             sinceBuild = "231"
             untilBuild = provider { null }
