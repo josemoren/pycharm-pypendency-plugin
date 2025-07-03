@@ -23,9 +23,9 @@ public class DIFileCreator {
         PyFile sourceCodeFile = (PyFile) targetPyClass.getContainingFile();
         DIFileTemplate fileTemplate = getDIFileTemplate(type);
         String fileContent = fileTemplate.getBaseTemplate()
-                .replace("{identifier}", fqn)
-                .replace("{fqn}", fqn)
-                .replace("{arguments}", getArguments(targetPyClass, fileTemplate));
+                                         .replace("{identifier}", fqn)
+                                         .replace("{fqn}", fqn)
+                                         .replace("{arguments}", getArguments(targetPyClass, fileTemplate));
 
         return PsiFileFactory.getInstance(sourceCodeFile.getProject()).createFileFromText(
                 sourceCodeFile.getName().replace(".py", fileTemplate.getFileExtension()),
@@ -49,21 +49,27 @@ public class DIFileCreator {
         StringBuilder builder = new StringBuilder(fileTemplate.getArgumentStatementBeginning());
         int numberOfSpaces = fileTemplate.getArgumentIndentationSpaces();
 
-        for (Map.Entry<PyParameter, List<IdentifierItem>> entry : groupIdentifiersByParameter(initArguments).entrySet()) {
+        for (var entry : groupIdentifiersByParameter(initArguments).entrySet()) {
             PyParameter parameter = entry.getKey();
             List<IdentifierItem> initArgumentsForParameter = entry.getValue();
 
             if (numberOfImplementationsForParameter(initArgumentsForParameter) > 1) {
-                appendWithIndentation(builder, numberOfSpaces, fileTemplate.getMultipleArgumentsTemplateBeginning().formatted(parameter.getName()));
+                appendWithIndentation(builder, numberOfSpaces,
+                                      fileTemplate.getMultipleArgumentsTemplateBeginning().formatted(
+                                              parameter.getName()));
             }
             for (IdentifierItem initArgument : initArgumentsForParameter) {
                 if (initArgument.isNotAClass() || (initArgument.hasNoImplementations() && initArgumentsForParameter.size() == 1)) {
                     String parameterName = parameter.getName();
                     @Nullable String parameterClass = ClassArgumentParser.parse(parameter.getText());
+
                     if (parameterClass == null) parameterClass = "Unknown";
-                    appendWithIndentation(builder, numberOfSpaces, fileTemplate.getMissingArgumentTemplate().formatted(parameterName, parameterClass));
+                    appendWithIndentation(builder, numberOfSpaces,
+                                          fileTemplate.getMissingArgumentTemplate().formatted(parameterName,
+                                                                                              parameterClass));
                 } else if (initArgument.identifier != null) {
-                    appendWithIndentation(builder, numberOfSpaces, fileTemplate.getArgumentTemplate().formatted(initArgument.identifier));
+                    appendWithIndentation(builder, numberOfSpaces,
+                                          fileTemplate.getArgumentTemplate().formatted(initArgument.identifier));
                 }
             }
 
@@ -71,20 +77,26 @@ public class DIFileCreator {
                 appendWithIndentation(builder, numberOfSpaces, fileTemplate.getMultipleArgumentsTemplateEnd());
             }
         }
+
         builder.append(fileTemplate.getArgumentStatementEnd());
         return builder.toString();
     }
 
     private static long numberOfImplementationsForParameter(List<IdentifierItem> initArgumentsForParameter) {
-        return initArgumentsForParameter.stream().filter(x -> x.identifier != null).count();
+        return initArgumentsForParameter.stream()
+                                        .filter(x -> x.identifier != null)
+                                        .count();
     }
 
     private static OrderedHashMap<PyParameter, List<IdentifierItem>> groupIdentifiersByParameter(Collection<IdentifierItem> identifiers) {
         return identifiers.stream()
-                .collect(Collectors.groupingBy(IdentifierItem::getParameter, OrderedHashMap::new, Collectors.toList()));
+                          .collect(Collectors.groupingBy(IdentifierItem::getParameter, OrderedHashMap::new,
+                                                         Collectors.toList()));
     }
 
     private static void appendWithIndentation(StringBuilder builder, int numberOfSpaces, String content) {
-        builder.append("\n").append(" ".repeat(numberOfSpaces)).append(content);
+        builder.append("\n")
+               .append(" ".repeat(numberOfSpaces))
+               .append(content);
     }
 }

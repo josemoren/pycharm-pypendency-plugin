@@ -4,10 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,18 +38,24 @@ public final class ResolutionCache implements PersistentStateComponent<Resolutio
 
         // This returns a Collection<String> because there may be multiple identifiers for the same className in the same project.
         public Collection<String> getCachedIdentifiersByClassName(String projectName, String className) {
-            return this.getResolutionCacheForProject(projectName).keySet().stream()
-                    .filter(identifier -> identifier != null && identifier.endsWith("." + className))
+            return this.getResolutionCacheForProject(projectName)
+                    .keySet()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .filter(identifier -> identifier.endsWith("." + className))
                     .collect(Collectors.toList());
         }
 
         public int countIdentifiers(String projectName) {
-            return this.getResolutionCacheForProject(projectName).keySet().size();
+            return this.getResolutionCacheForProject(projectName).size();
         }
 
         public List<String> fuzzyFindIdentifiersMatching(String projectName, String identifier) {
-            return this.getResolutionCacheForProject(projectName).keySet().stream()
-                    .filter(key -> key.toLowerCase().contains(identifier.toLowerCase()))
+            return this.getResolutionCacheForProject(projectName)
+                    .keySet()
+                    .stream()
+                    .map(String::toLowerCase)
+                    .filter(key -> key.contains(identifier.toLowerCase()))
                     .toList();
         }
     }

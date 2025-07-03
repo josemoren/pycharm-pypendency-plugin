@@ -6,11 +6,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ClassArgumentParser {
-
     /**
      * Example input: "logger: Logger,"
      * Example output: "Logger"
+     *
      * @param argumentLine Argument line to parse
+     *
      * @return Class name of the argument
      */
     public static @Nullable String parse(String argumentLine) {

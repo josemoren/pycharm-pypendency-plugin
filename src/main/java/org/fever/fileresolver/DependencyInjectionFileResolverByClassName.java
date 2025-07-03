@@ -16,12 +16,14 @@ public class DependencyInjectionFileResolverByClassName {
         ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
         String projectName = manager.getProject().getName();
         String cachedFilePath = resolutionCache.getCachedResolution(projectName, identifier);
+
         if (cachedFilePath == null) {
             LOG.info("No cached resolution found for " + identifier);
             return null;
         }
 
-        PsiFile fileRetrievedFromCachedPath = SourceCodeFileResolverByFqn.getFileFromAbsolutePath(cachedFilePath, manager);
+        PsiFile fileRetrievedFromCachedPath = SourceCodeFileResolverByFqn.getFileFromAbsolutePath(cachedFilePath,
+                                                                                                  manager);
         if (fileRetrievedFromCachedPath == null) {
             LOG.warn("Cached file not found at " + cachedFilePath + ". Removing from cache.");
             resolutionCache.removeCachedResolution(projectName, identifier);
@@ -35,11 +37,14 @@ public class DependencyInjectionFileResolverByClassName {
         ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
         PsiManager psiManager = PsiManager.getInstance(project);
         String projectName = project.getName();
-        Collection<String> possibleIdentifiers = resolutionCache.getCachedIdentifiersByClassName(projectName, className);
+        Collection<String> possibleIdentifiers = resolutionCache.getCachedIdentifiersByClassName(projectName,
+                                                                                                 className);
         LOG.info("Possible identifiers found for class " + className + ": " + String.join("\n\t", possibleIdentifiers));
         ArrayList<PsiFile> possibleDIFiles = new ArrayList<>();
+
         for (String identifier : possibleIdentifiers) {
             PsiFile fileRetrievedFromCachedPath = resolveFromCache(psiManager, identifier);
+
             if (fileRetrievedFromCachedPath != null) {
                 possibleDIFiles.add(fileRetrievedFromCachedPath);
             }

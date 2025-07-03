@@ -29,34 +29,43 @@ public class PythonReferenceProvider extends ReferenceProvider {
                 return getReferenceForIdentifierAsArray(element, text);
             }
         }
+
         return PsiReference.EMPTY_ARRAY;
     }
 
     private static boolean isInDependencyInjectionFile(@NotNull PsiElement element) {
         VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
+
         if (virtualFile == null) {
             return false;
         }
+
         String absoluteFilePath = virtualFile.getCanonicalPath();
         if (absoluteFilePath == null) {
             return false;
         }
+
         return absoluteFilePath.contains(DEPENDENCY_INJECTION_FOLDER);
     }
 
     private static com.intellij.psi.PsiReference @NotNull [] getReferenceForIdentifierAsArray(@NotNull PsiElement element, String text) {
         PsiReference reference = getReferenceForIdentifier(element, text);
-        return new PsiReference[]{reference};
+        return new PsiReference[]{ reference };
     }
-    private boolean isInContainerBuilderStatement(PsiElement element) {
+
+    private static boolean isInContainerBuilderStatement(PsiElement element) {
         PsiElement grandParent = element.getParent().getParent();
+
         if (!(grandParent instanceof PyCallExpression)) {
             return false;
         }
+
         PsiElement firstChild = grandParent.getFirstChild();
+
         if (!(firstChild instanceof PyReferenceExpressionImpl)) {
             return false;
         }
+
         QualifiedName qualifiedName = ((PyReferenceExpression) firstChild).asQualifiedName();
         if (qualifiedName == null) {
             return false;

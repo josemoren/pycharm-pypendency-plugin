@@ -1,9 +1,9 @@
 <idea-plugin>
-    <id>org.fever.pypendency</id>
-    <name>Pypendency</name>
-    <vendor email="jose.moreno@feverup.com" url="http://www.feverup.com">Fever</vendor>
+  <id>org.fever.pypendency</id>
+  <name>Pypendency</name>
+  <vendor email="jose.moreno@feverup.com" url="http://www.feverup.com">Fever</vendor>
 
-    <description><![CDATA[
+  <description><![CDATA[
     <h2>
     Provides navigation for <a href="https://pypi.org/project/pypendency/">Pypendency</a> files.
     </h2>
@@ -26,44 +26,44 @@
 
     ]]></description>
 
-    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-         on how to target different products -->
-    <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.modules.lang</depends>
-    <depends>com.intellij.modules.python</depends>
-    <depends>org.jetbrains.plugins.yaml</depends>
+  <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.lang</depends>
+  <depends>com.intellij.modules.python</depends>
+  <depends>org.jetbrains.plugins.yaml</depends>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <psi.referenceContributor language="yaml" implementation="org.fever.contributor.YamlReferenceContributor"/>
-        <psi.referenceContributor language="Python" implementation="org.fever.contributor.PythonReferenceContributor"/>
-        <completion.contributor language="yaml" implementationClass="org.fever.contributor.CompletionContributor"/>
-        <completion.contributor language="Python" implementationClass="org.fever.contributor.CompletionContributor"/>
-        <applicationService serviceImplementation="org.fever.ResolutionCache"/>
-        <backgroundPostStartupActivity implementation="org.fever.cachepopulator.PopulateCacheOnProjectStart"/>
-        <notificationGroup id="Pypendency notification" displayType="BALLOON"/>
-        <codeInsight.lineMarkerProvider language="Python"
-                                        implementationClass="org.fever.provider.PythonLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="yaml"
-                                        implementationClass="org.fever.provider.YamlLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="Python"
-                                        implementationClass="org.fever.provider.CreateDILineMarkerProvider"/>
-    </extensions>
+  <extensions defaultExtensionNs="com.intellij">
+    <psi.referenceContributor language="yaml" implementation="org.fever.contributor.YamlReferenceContributor"/>
+    <psi.referenceContributor language="Python" implementation="org.fever.contributor.PythonReferenceContributor"/>
+    <completion.contributor language="yaml" implementationClass="org.fever.contributor.CompletionContributor"/>
+    <completion.contributor language="Python" implementationClass="org.fever.contributor.CompletionContributor"/>
+    <applicationService serviceImplementation="org.fever.ResolutionCache"/>
+    <backgroundPostStartupActivity implementation="org.fever.cachepopulator.PopulateCacheOnProjectStart"/>
+    <notificationGroup id="Pypendency notification" displayType="BALLOON"/>
+    <codeInsight.lineMarkerProvider language="Python"
+                                    implementationClass="org.fever.provider.PythonLineMarkerProvider"/>
+    <codeInsight.lineMarkerProvider language="yaml"
+                                    implementationClass="org.fever.provider.YamlLineMarkerProvider"/>
+    <codeInsight.lineMarkerProvider language="Python"
+                                    implementationClass="org.fever.provider.CreateDILineMarkerProvider"/>
+  </extensions>
 
-    <actions>
-        <group id="PypendencyGroup" popup="true" text="Pypendency">
-            <add-to-group group-id="GoToCodeGroup" anchor="after" relative-to-action="GotoTest"/>
-        </group>
-        <action id="GotoPypendency" class="org.fever.codeInsight.GotoPypendencyOrCodeAction"
-                text="Pypendency: Go to/Create DI File" popup="true">
-            <add-to-group group-id="PypendencyGroup" anchor="first"/>
-            <add-to-group group-id="EditorPopupMenu.GoTo"/>
-        </action>
-        <action id="GotoCodeFromPypendency" class="org.fever.codeInsight.GotoCodeAction" text="Pypendency: Go to Code">
-            <add-to-group group-id="PypendencyGroup" anchor="after" relative-to-action="GotoPypendency"/>
-        </action>
-        <action id="GotoInjectedImplementation" class="org.fever.codeInsight.GotoInjectedImplementationAction"
-                text="Pypendency: Go to Injected Implementation">
-            <add-to-group group-id="PypendencyGroup" anchor="after" relative-to-action="GotoCodeFromPypendency"/>
-        </action>
-    </actions>
+  <actions>
+    <group id="PypendencyGroup" popup="true" text="Pypendency">
+      <add-to-group group-id="GoToCodeGroup" anchor="after" relative-to-action="GotoTest"/>
+    </group>
+    <action id="GotoPypendency" class="org.fever.codeInsight.GotoPypendencyOrCodeAction"
+            text="Pypendency: Go to/Create DI File" popup="true">
+      <add-to-group group-id="PypendencyGroup" anchor="first"/>
+      <add-to-group group-id="EditorPopupMenu.GoTo"/>
+    </action>
+    <action id="GotoCodeFromPypendency" class="org.fever.codeInsight.GotoCodeAction" text="Pypendency: Go to Code">
+      <add-to-group group-id="PypendencyGroup" anchor="after" relative-to-action="GotoPypendency"/>
+    </action>
+    <action id="GotoInjectedImplementation" class="org.fever.codeInsight.GotoInjectedImplementationAction"
+            text="Pypendency: Go to Injected Implementation">
+      <add-to-group group-id="PypendencyGroup" anchor="after" relative-to-action="GotoCodeFromPypendency"/>
+    </action>
+  </actions>
 </idea-plugin>

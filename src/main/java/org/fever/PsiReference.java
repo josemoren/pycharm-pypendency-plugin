@@ -1,7 +1,9 @@
 package org.fever;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiReferenceBase;
 import org.fever.fileresolver.DependencyInjectionFileResolverByIdentifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

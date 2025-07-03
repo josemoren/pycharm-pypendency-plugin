@@ -31,14 +31,17 @@ public class DependencyInjectionFileResolverByIdentifier {
      * return: <PROJECT_PATH>/src/core/_dependency_injection/infrastructure/user/finders/core_user_finder
      *
      * @param identifier full qualified name of the class.
+     *
      * @return string with the full path of the DI file without the file extension.
      */
     public static @Nullable PsiFile resolve(PsiManager psiManager, String identifier) {
         String cleanIdentifier = identifier.replaceAll("[\"'@]", "");
         PsiFile dependencyInjectionFile = resolveFromCache(psiManager, cleanIdentifier);
+
         if (dependencyInjectionFile != null) {
             return dependencyInjectionFile;
         }
+
         return resolveManuallyAndStoreInCache(psiManager, cleanIdentifier);
     }
 
@@ -46,11 +49,13 @@ public class DependencyInjectionFileResolverByIdentifier {
         ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
         String projectName = manager.getProject().getName();
         String cachedFilePath = resolutionCache.getCachedResolution(projectName, identifier);
+
         if (cachedFilePath == null) {
             return null;
         }
 
-        PsiFile fileRetrievedFromCachedPath = SourceCodeFileResolverByFqn.getFileFromAbsolutePath(cachedFilePath, manager);
+        PsiFile fileRetrievedFromCachedPath = SourceCodeFileResolverByFqn.getFileFromAbsolutePath(cachedFilePath,
+                                                                                                  manager);
         if (fileRetrievedFromCachedPath == null) {
             LOG.warn("Cached file not found at " + cachedFilePath + ". Removing from cache.");
             resolutionCache.removeCachedResolution(projectName, identifier);
@@ -79,16 +84,22 @@ public class DependencyInjectionFileResolverByIdentifier {
 
     private static @Nullable PsiFile resolveToDependencyInjectionManualDeclaration(String identifier, PsiManager psiManager) {
         GlobalSearchScope scope = GlobalSearchScope.projectScope(psiManager.getProject());
-
-        Collection<VirtualFile> yamlDependencyInjectionFiles = DependencyInjectionFilesFinder.find(YAMLFileType.YML, scope);
-        PsiFile yamlDependencyInjectionFile = findDependencyInjectionFileInCollection(REGEX_FOR_YAML_DI_FILES, yamlDependencyInjectionFiles, psiManager, identifier);
+        Collection<VirtualFile> yamlDependencyInjectionFiles = DependencyInjectionFilesFinder.find(YAMLFileType.YML,
+                                                                                                   scope);
+        PsiFile yamlDependencyInjectionFile = findDependencyInjectionFileInCollection(REGEX_FOR_YAML_DI_FILES,
+                                                                                      yamlDependencyInjectionFiles,
+                                                                                      psiManager, identifier);
         if (yamlDependencyInjectionFile != null) {
             return yamlDependencyInjectionFile;
         }
 
-        Collection<VirtualFile> pythonDependencyInjectionFiles = DependencyInjectionFilesFinder.find(PythonFileType.INSTANCE, scope);
+        Collection<VirtualFile> pythonDependencyInjectionFiles = DependencyInjectionFilesFinder.find(
+                PythonFileType.INSTANCE, scope);
+
         for (String regex : REGEX_FOR_PYTHON_MANUALLY_SET_IDENTIFIERS) {
-            PsiFile pythonDependencyInjectionFile = findDependencyInjectionFileInCollection(regex, pythonDependencyInjectionFiles, psiManager, identifier);
+            PsiFile pythonDependencyInjectionFile = findDependencyInjectionFileInCollection(regex,
+                                                                                            pythonDependencyInjectionFiles,
+                                                                                            psiManager, identifier);
             if (pythonDependencyInjectionFile != null) {
                 return pythonDependencyInjectionFile;
             }
@@ -99,12 +110,16 @@ public class DependencyInjectionFileResolverByIdentifier {
 
     private static @Nullable PsiFile findDependencyInjectionFileInCollection(String regex, Collection<VirtualFile> diFiles, PsiManager psiManager, String identifier) {
         Matcher matcher = Pattern.compile(regex).matcher("");
+
         for (VirtualFile virtualFile : diFiles) {
             PsiFile diFile = psiManager.findFile(virtualFile);
+
             if (diFile == null) {
                 continue;
             }
+
             String diFileContent = diFile.getText();
+
             if (identifierIsDefinedInFile(diFileContent, identifier, matcher)) {
                 return diFile;
             }
@@ -114,11 +129,13 @@ public class DependencyInjectionFileResolverByIdentifier {
 
     private static boolean identifierIsDefinedInFile(String diFileContent, String identifier, Matcher matcher) {
         matcher.reset(diFileContent);
+
         while (matcher.find()) {
             if (matcher.group(1).equals(identifier)) {
                 return true;
             }
         }
+
         return false;
     }
 }

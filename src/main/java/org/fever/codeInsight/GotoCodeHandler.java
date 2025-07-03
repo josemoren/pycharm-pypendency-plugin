@@ -4,8 +4,9 @@ import com.intellij.codeInsight.navigation.GotoTargetHandler;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.NlsContexts;
-import com.intellij.psi.*;
+import com.intellij.openapi.util.NlsContexts.HintText;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.util.SmartList;
 import org.fever.fileresolver.SourceCodeFileResolverByFqn;
 import org.fever.utils.FqnExtractor;
@@ -48,15 +49,12 @@ public class GotoCodeHandler extends GotoTargetHandler {
             return null;
         }
 
-        PsiElement[] targets = new PsiElement[]{sourceCodeFile};
-        return new GotoData(
-                dependencyInjectionFile,
-                targets,
-                new SmartList<>());
+        PsiElement[] targets = new PsiElement[]{ sourceCodeFile };
+        return new GotoData(dependencyInjectionFile, targets, new SmartList<>());
     }
 
     @Override
-    protected @NotNull @NlsContexts.HintText String getNotFoundMessage(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
+    protected @NotNull @HintText String getNotFoundMessage(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
         return NOT_FOUND;
     }
 }

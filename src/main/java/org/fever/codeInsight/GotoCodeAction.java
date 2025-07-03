@@ -14,7 +14,7 @@ public class GotoCodeAction extends BaseCodeInsightAction {
 
     @Override
     @NotNull
-    protected CodeInsightActionHandler getHandler(){
+    protected CodeInsightActionHandler getHandler() {
         return new GotoCodeHandler(this.anActionEvent);
     }
 
