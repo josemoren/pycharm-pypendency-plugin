@@ -53,7 +53,7 @@ public class PythonReferenceProvider extends ReferenceProvider {
         return new PsiReference[]{ reference };
     }
 
-    private boolean isInContainerBuilderStatement(PsiElement element) {
+    private static boolean isInContainerBuilderStatement(PsiElement element) {
         PsiElement grandParent = element.getParent().getParent();
 
         if (!(grandParent instanceof PyCallExpression)) {
