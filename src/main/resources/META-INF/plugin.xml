@@ -47,6 +47,8 @@
                                     implementationClass="org.fever.provider.YamlLineMarkerProvider"/>
     <codeInsight.lineMarkerProvider language="Python"
                                     implementationClass="org.fever.provider.CreateDILineMarkerProvider"/>
+    <codeInsight.lineMarkerProvider language="Python"
+                                    implementationClass="org.fever.provider.PythonDILineMarkerProvider"/>
   </extensions>
 
   <actions>
