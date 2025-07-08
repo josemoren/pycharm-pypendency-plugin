@@ -14,6 +14,7 @@ import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.awt.RelativePoint;
+import com.jetbrains.python.PythonFileType;
 import com.jetbrains.python.psi.PyClass;
 import org.fever.filecreator.DIFileType;
 import org.fever.fileresolver.DependencyInjectionFileResolverByIdentifier;
@@ -31,7 +32,8 @@ import java.util.Objects;
 public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
     private static final Icon GOTO_DI_ICON = IconCreator.create("icons/goToDI.svg");
     private static final Icon CREATE_DI_ICON = IconCreator.create("icons/createDI.svg");
-    private static final Icon PYTHON_ICON = IconCreator.create("icons/python.svg");
+    private static final Icon PYTHON_ICON = PythonFileType.INSTANCE.getIcon();
+    private static final Icon YAML_ICON = AllIcons.FileTypes.Yaml;
 
     public @Nullable @GutterName String getName() {
         return "Smart navigation to dependency injection files";
@@ -112,32 +114,38 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
         }
     }
 
-    private static class DICreationPopupStep extends BaseListPopupStep<String> {
+    private static class DICreationPopupStep extends BaseListPopupStep<DIFileType> {
         private final PsiElement element;
         private static final String TITLE = "Choose DI File Format";
-        private static final String[] FORMATS = { "YAML", "Python" };
 
         public DICreationPopupStep(@NotNull PsiElement element) {
-            super(TITLE, FORMATS);
+            super(TITLE, DIFileType.values());
             this.element = element;
         }
 
         @Override
-        public @NotNull String getTextFor(String value) {
-            return value;
+        public @NotNull String getTextFor(DIFileType value) {
+            return value.getName() + " File";
         }
 
         @Override
-        public @Nullable PopupStep<?> onChosen(String selectedValue, boolean finalChoice) {
-            DIFileType type = "YAML".equals(selectedValue) ? DIFileType.YAML : DIFileType.PYTHON;
-
+        public @Nullable PopupStep<?> onChosen(DIFileType selectedValue, boolean finalChoice) {
             Editor editor = FileEditorManager.getInstance(element.getProject()).getSelectedTextEditor();
+
             if (editor == null) {
                 return FINAL_CHOICE;
             }
 
-            DIFileOpener.open(editor, element.getContainingFile(), type);
+            DIFileOpener.open(editor, element.getContainingFile(), selectedValue);
             return FINAL_CHOICE;
+        }
+
+        @Override
+        public Icon getIconFor(DIFileType value) {
+            return switch (value) {
+                case YAML -> YAML_ICON;
+                case PYTHON -> PYTHON_ICON;
+            };
         }
     }
 
@@ -162,10 +170,9 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
         public Icon getIconFor(PsiFile file) {
             String extension = Objects.requireNonNull(file.getVirtualFile().getExtension());
 
-            return switch (extension) {
-                case "yaml", "yml" -> AllIcons.FileTypes.Yaml;
-                case "py" -> PYTHON_ICON;
-                default -> AllIcons.FileTypes.Unknown;
+            return switch (DIFileType.fromExtension(extension)) {
+                case YAML -> YAML_ICON;
+                case PYTHON -> PYTHON_ICON;
             };
         }
 

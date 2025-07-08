@@ -29,6 +29,7 @@ public class SourceCodeFileResolverByFqn {
                 return file;
             }
         }
+
         return null;
     }
 
@@ -62,6 +63,7 @@ public class SourceCodeFileResolverByFqn {
                     sourceCodeRootAbsolutePath + "/" + relativeFilePath + "/" + CaseFormatter.camelCaseToSnakeCase(
                             className) + ".py");
         }
+
         return possibleFilePaths;
     }
 
@@ -69,10 +71,6 @@ public class SourceCodeFileResolverByFqn {
     public static @Nullable PsiFile getFileFromAbsolutePath(String absolutePath, PsiManager psiManager) {
         VirtualFile file = LocalFileSystem.getInstance().findFileByPath(absolutePath);
 
-        if (file != null) {
-            return psiManager.findFile(file);
-        }
-
-        return null;
+        return file != null ? psiManager.findFile(file) : null;
     }
 }

@@ -1,11 +1,10 @@
 package org.fever.filecreator.templates;
 
 import com.intellij.openapi.fileTypes.FileType;
+import org.fever.filecreator.DIFileType;
 import org.jetbrains.yaml.YAMLFileType;
 
 public class YamlDIFileTemplate implements DIFileTemplate {
-    private static final String FILE_EXTENSION = ".yaml";
-    private static final FileType FILE_TYPE = YAMLFileType.YML;
     private static final int ARGUMENT_INDENTATION_SPACES = 8;
     private static final String BASE_TEMPLATE = """
             {identifier}:
@@ -20,12 +19,12 @@ public class YamlDIFileTemplate implements DIFileTemplate {
 
     @Override
     public String getFileExtension() {
-        return FILE_EXTENSION;
+        return DIFileType.YAML.getFileExtension();
     }
 
     @Override
     public FileType getFileType() {
-        return FILE_TYPE;
+        return YAMLFileType.YML;
     }
 
     @Override

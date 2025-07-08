@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class DIFileCreator {
-
     public static PsiFile create(PyClass targetPyClass, String fqn, DIFileType type) {
         PyFile sourceCodeFile = (PyFile) targetPyClass.getContainingFile();
         DIFileTemplate fileTemplate = getDIFileTemplate(type);
@@ -34,9 +33,10 @@ public class DIFileCreator {
     }
 
     private static DIFileTemplate getDIFileTemplate(DIFileType type) {
-        if (type == DIFileType.PYTHON) return new PythonDIFileTemplate();
-        if (type == DIFileType.YAML) return new YamlDIFileTemplate();
-        throw new IllegalArgumentException("Unknown DIFileType: " + type);
+        return switch (type) {
+            case YAML -> new YamlDIFileTemplate();
+            case PYTHON -> new PythonDIFileTemplate();
+        };
     }
 
     private static String getArguments(PyClass pyClass, DIFileTemplate fileTemplate) {

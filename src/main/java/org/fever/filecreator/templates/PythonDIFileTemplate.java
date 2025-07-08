@@ -2,10 +2,9 @@ package org.fever.filecreator.templates;
 
 import com.intellij.openapi.fileTypes.FileType;
 import com.jetbrains.python.PythonFileType;
+import org.fever.filecreator.DIFileType;
 
 public class PythonDIFileTemplate implements DIFileTemplate {
-    private static final String FILE_EXTENSION = ".py";
-    private static final FileType FILE_TYPE = PythonFileType.INSTANCE;
     private static final int ARGUMENT_INDENTATION_SPACES = 16;
     private static final String BASE_TEMPLATE = """
             from pypendency.argument import Argument
@@ -31,12 +30,12 @@ public class PythonDIFileTemplate implements DIFileTemplate {
 
     @Override
     public String getFileExtension() {
-        return FILE_EXTENSION;
+        return DIFileType.PYTHON.getFileExtension();
     }
 
     @Override
     public FileType getFileType() {
-        return FILE_TYPE;
+        return PythonFileType.INSTANCE;
     }
 
     @Override
