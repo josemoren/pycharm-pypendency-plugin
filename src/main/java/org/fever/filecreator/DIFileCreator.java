@@ -21,14 +21,14 @@ public class DIFileCreator {
         PyFile sourceCodeFile = (PyFile) targetPyClass.getContainingFile();
         DIFileTemplate fileTemplate = getDIFileTemplate(type);
         String fileContent = fileTemplate.getBaseTemplate()
-                .replace("{identifier}", fqn)
-                .replace("{fqn}", fqn)
-                .replace("{arguments}", getArguments(targetPyClass, fileTemplate));
+            .replace("{identifier}", fqn)
+            .replace("{fqn}", fqn)
+            .replace("{arguments}", getArguments(targetPyClass, fileTemplate));
 
         return PsiFileFactory.getInstance(sourceCodeFile.getProject()).createFileFromText(
-                sourceCodeFile.getName().replace(".py", fileTemplate.getFileExtension()),
-                fileTemplate.getFileType(),
-                fileContent
+            sourceCodeFile.getName().replace(".py", fileTemplate.getFileExtension()),
+            fileTemplate.getFileType(),
+            fileContent
         );
     }
 
@@ -55,7 +55,7 @@ public class DIFileCreator {
             if (numberOfImplementationsForParameter(initArgumentsForParameter) > 1) {
                 appendWithIndentation(builder, numberOfSpaces,
                                       fileTemplate.getMultipleArgumentsTemplateBeginning().formatted(
-                                              parameter.getName()));
+                                          parameter.getName()));
             }
             for (IdentifierItem initArgument : initArgumentsForParameter) {
                 if (initArgument.isNotAClass() || (initArgument.hasNoImplementations() && initArgumentsForParameter.size() == 1)) {
@@ -83,19 +83,22 @@ public class DIFileCreator {
 
     private static long numberOfImplementationsForParameter(List<IdentifierItem> initArgumentsForParameter) {
         return initArgumentsForParameter.stream()
-                .filter(x -> x.identifier != null)
-                .count();
+            .filter(x -> x.identifier != null)
+            .count();
     }
 
     private static OrderedHashMap<PyParameter, List<IdentifierItem>> groupIdentifiersByParameter(Collection<IdentifierItem> identifiers) {
         return identifiers.stream()
-                .collect(Collectors.groupingBy(IdentifierItem::getParameter, OrderedHashMap::new,
-                                               Collectors.toList()));
+            .collect(Collectors.groupingBy(
+                IdentifierItem::getParameter,
+                OrderedHashMap::new,
+                Collectors.toList()
+            ));
     }
 
     private static void appendWithIndentation(StringBuilder builder, int numberOfSpaces, String content) {
         builder.append("\n")
-                .append(" ".repeat(numberOfSpaces))
-                .append(content);
+            .append(" ".repeat(numberOfSpaces))
+            .append(content);
     }
 }

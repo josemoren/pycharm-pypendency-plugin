@@ -1,7 +1,6 @@
 package org.fever.filecreator.templates;
 
 import com.intellij.openapi.fileTypes.FileType;
-import com.jetbrains.python.PythonFileType;
 import org.fever.filecreator.DIFileType;
 
 public class PythonDIFileTemplate implements DIFileTemplate {

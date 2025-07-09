@@ -35,7 +35,8 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
                     new String[]{
                             "container(?:_builder)?\\.set\\(\\s*\"(\\S+)",
                             "container_builder\\.set_definition\\(\\s*Definition\\(\\s*\"(\\S+)"
-                    })
+                    }
+            )
     };
 
     @Nullable

@@ -23,7 +23,7 @@ public class PypendencyDirectoryCreator {
 
         Project fileProject = file.getProject();
         return WriteAction.compute(
-                () -> DirectoryUtil.mkdirs(PsiManager.getInstance(fileProject), diNewPath)
+            () -> DirectoryUtil.mkdirs(PsiManager.getInstance(fileProject), diNewPath)
         );
     }
 }

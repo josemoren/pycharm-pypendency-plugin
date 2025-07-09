@@ -2,14 +2,13 @@ package org.fever.filecreator.templates;
 
 import com.intellij.openapi.fileTypes.FileType;
 import org.fever.filecreator.DIFileType;
-import org.jetbrains.yaml.YAMLFileType;
 
 public class YamlDIFileTemplate implements DIFileTemplate {
     private static final int ARGUMENT_INDENTATION_SPACES = 8;
     private static final String BASE_TEMPLATE = """
-            {identifier}:
-                fqn: {fqn}{arguments}
-            """;
+        {identifier}:
+            fqn: {fqn}{arguments}
+        """;
     private static final String ARGUMENT_STATEMENT_BEGINNING = "\n    args:";
     private static final String MULTIPLE_ARGUMENTS_TEMPLATE_BEGINNING = "# TODO: 👇 Multiple arguments found for %s, leave only one:";
     private static final String MULTIPLE_ARGUMENTS_TEMPLATE_END = "# TODO: 👆";
