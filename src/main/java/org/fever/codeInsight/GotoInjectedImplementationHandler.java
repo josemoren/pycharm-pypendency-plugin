@@ -29,8 +29,8 @@ import java.util.Objects;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
-import static org.fever.utils.IdentifierExtractor.isPythonFile;
-import static org.fever.utils.IdentifierExtractor.isYamlFile;
+import static org.fever.utils.FileTypeByExtensionChecker.isPythonFile;
+import static org.fever.utils.FileTypeByExtensionChecker.isYamlFile;
 
 public class GotoInjectedImplementationHandler extends GotoTargetHandler {
     public static final String FEATURE_KEY = "navigation.goto.injectedImplementation";
@@ -54,14 +54,13 @@ public class GotoInjectedImplementationHandler extends GotoTargetHandler {
     @Override
     protected @Nullable GotoData getSourceAndTargetElements(Editor editor, PsiFile file) {
         int caretOffset = editor.getCaretModel().getOffset();
-        PsiElement elementUnderCaret = file.findElementAt(caretOffset);
 
+        PsiElement elementUnderCaret = file.findElementAt(caretOffset);
         if (elementUnderCaret == null) {
             return null;
         }
 
         PsiFile injectedImplementationFile = getInjectedImplementation(editor, elementUnderCaret);
-
         if (injectedImplementationFile == null) {
             return null;
         }
@@ -89,8 +88,8 @@ public class GotoInjectedImplementationHandler extends GotoTargetHandler {
         }
 
         String targetFqn = getFqnFromIdentifier(manager, targetIdentifier);
-        PsiFile injectedImplementationSourceCodeFile = SourceCodeFileResolverByFqn.resolve(targetFqn, manager);
 
+        PsiFile injectedImplementationSourceCodeFile = SourceCodeFileResolverByFqn.resolve(targetFqn, manager);
         if (injectedImplementationSourceCodeFile == null) {
             String message = "Could not find the source code file associated to the FQN \"" + targetFqn + "\".";
             PypendencyNotifier.notify(project, message, NotificationType.ERROR);

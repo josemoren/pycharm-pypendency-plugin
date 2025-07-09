@@ -6,6 +6,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.fever.utils.FileTypeByExtensionChecker.isPythonFile;
+import static org.fever.utils.FileTypeByExtensionChecker.isYamlFile;
+
 public class FqnExtractor {
     private static final String YAML_FQN_GROUP_SELECTOR_REGEX = "fqn:\\s*(\\S+)";
     private static final String PYTHON_FQN_GROUP_SELECTOR_REGEX = "container_builder\\.set_definition\\(\\s*Definition\\(\\s*\"[^\"]+\",\\s*\"([^\"]+)\"";
@@ -35,14 +38,6 @@ public class FqnExtractor {
         }
 
         return null;
-    }
-
-    private static Boolean isYamlFile(String extension) {
-        return extension.equals("yaml") || extension.equals("yml");
-    }
-
-    private static Boolean isPythonFile(String extension) {
-        return extension.equals("py");
     }
 
     public static @Nullable String extractFqnFromYaml(String fileContent) {
