@@ -61,7 +61,6 @@ public class PythonReferenceProvider extends ReferenceProvider {
         }
 
         PsiElement firstChild = grandParent.getFirstChild();
-
         if (!(firstChild instanceof PyReferenceExpressionImpl)) {
             return false;
         }

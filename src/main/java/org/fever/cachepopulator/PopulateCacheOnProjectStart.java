@@ -29,9 +29,7 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
     }
 
     private static final DependencyInjectionFileType[] FILE_TYPES = {
-            new DependencyInjectionFileType(
-                    YAMLFileType.YML,
-                    new String[]{ "^(\\S+):\n\\s*fqn:" }),
+            new DependencyInjectionFileType(YAMLFileType.YML, new String[]{ "^(\\S+):\n\\s*fqn:" }),
             new DependencyInjectionFileType(
                     PythonFileType.INSTANCE,
                     new String[]{
