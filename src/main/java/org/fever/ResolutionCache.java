@@ -39,11 +39,11 @@ public final class ResolutionCache implements PersistentStateComponent<Resolutio
         // This returns a Collection<String> because there may be multiple identifiers for the same className in the same project.
         public Collection<String> getCachedIdentifiersByClassName(String projectName, String className) {
             return this.getResolutionCacheForProject(projectName)
-                    .keySet()
-                    .stream()
-                    .filter(Objects::nonNull)
-                    .filter(identifier -> identifier.endsWith("." + className))
-                    .collect(Collectors.toList());
+                       .keySet()
+                       .stream()
+                       .filter(Objects::nonNull)
+                       .filter(identifier -> identifier.endsWith("." + className))
+                       .collect(Collectors.toList());
         }
 
         public int countIdentifiers(String projectName) {
@@ -52,11 +52,11 @@ public final class ResolutionCache implements PersistentStateComponent<Resolutio
 
         public List<String> fuzzyFindIdentifiersMatching(String projectName, String identifier) {
             return this.getResolutionCacheForProject(projectName)
-                    .keySet()
-                    .stream()
-                    .map(String::toLowerCase)
-                    .filter(key -> key.contains(identifier.toLowerCase()))
-                    .toList();
+                       .keySet()
+                       .stream()
+                       .map(String::toLowerCase)
+                       .filter(key -> key.contains(identifier.toLowerCase()))
+                       .toList();
         }
     }
 
