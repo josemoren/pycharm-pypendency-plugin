@@ -89,7 +89,8 @@ public class DIFileCreator {
 
     private static OrderedHashMap<PyParameter, List<IdentifierItem>> groupIdentifiersByParameter(Collection<IdentifierItem> identifiers) {
         return identifiers.stream()
-                .collect(Collectors.groupingBy(IdentifierItem::getParameter, OrderedHashMap::new, Collectors.toList()));
+                .collect(Collectors.groupingBy(IdentifierItem::getParameter, OrderedHashMap::new,
+                                               Collectors.toList()));
     }
 
     private static void appendWithIndentation(StringBuilder builder, int numberOfSpaces, String content) {
