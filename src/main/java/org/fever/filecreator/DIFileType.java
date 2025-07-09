@@ -15,72 +15,32 @@ public enum DIFileType {
     private final String fileExtension;
     private final LanguageFileType fileType;
 
-    /**
-     * Constructs a new {@link DIFileType} with the specified extension and name.
-     *
-     * @param extension the file extension without the dot.
-     * @param fileType the associated {@link LanguageFileType}.
-     */
     DIFileType(@NotNull String extension, LanguageFileType fileType) {
         this.extension = extension;
         this.fileExtension = "." + extension;
         this.fileType = fileType;
     }
 
-    /**
-     * Returns the file extension without the dot.
-     *
-     * @return the file extension.
-     */
     public String getExtension() {
         return extension;
     }
 
-    /**
-     * Returns the file extension with the dot.
-     *
-     * @return the file extension with a leading dot.
-     */
     public String getFileExtension() {
         return fileExtension;
     }
 
-    /**
-     * Returns the name of the file type.
-     *
-     * @return the name of the file type.
-     */
     public String getName() {
         return fileType.getName();
     }
 
-    /**
-     * Returns the icon associated with the file type.
-     *
-     * @return the icon for the file type.
-     */
     public Icon getIcon() {
         return fileType.getIcon();
     }
 
-    /**
-     * Returns the {@link LanguageFileType} associated with this file type.
-     *
-     * @return the {@link LanguageFileType} for this file type.
-     */
     public LanguageFileType getFileType() {
         return fileType;
     }
 
-    /**
-     * Returns the {@link DIFileType} corresponding to the given file extension.
-     *
-     * @param extension the file extension to match.
-     *
-     * @return the {@link DIFileType} corresponding to the given extension.
-     *
-     * @throws IllegalArgumentException if no matching {@link DIFileType} is found.
-     */
     public static DIFileType fromExtension(@NotNull String extension) {
         for (DIFileType type : values()) {
             if (type.extension.equalsIgnoreCase(extension)) {
