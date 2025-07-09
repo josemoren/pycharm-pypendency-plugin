@@ -24,7 +24,7 @@ public class YamlDIFileTemplate implements DIFileTemplate {
 
     @Override
     public FileType getFileType() {
-        return YAMLFileType.YML;
+        return DIFileType.YAML.getFileType();
     }
 
     @Override

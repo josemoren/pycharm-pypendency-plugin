@@ -35,7 +35,7 @@ public class PythonDIFileTemplate implements DIFileTemplate {
 
     @Override
     public FileType getFileType() {
-        return PythonFileType.INSTANCE;
+        return DIFileType.PYTHON.getFileType();
     }
 
     @Override
