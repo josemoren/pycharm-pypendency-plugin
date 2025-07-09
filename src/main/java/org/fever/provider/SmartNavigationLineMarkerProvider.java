@@ -4,7 +4,6 @@ import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.GutterName;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -14,12 +13,10 @@ import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.awt.RelativePoint;
-import com.jetbrains.python.PythonFileType;
 import com.jetbrains.python.psi.PyClass;
 import org.fever.filecreator.DIFileType;
 import org.fever.fileresolver.DependencyInjectionFileResolverByIdentifier;
 import org.fever.utils.DIFileOpener;
-import org.fever.utils.IconCreator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,12 +26,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
-public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
-    private static final Icon GOTO_DI_ICON = IconCreator.create("icons/goToDI.svg");
-    private static final Icon CREATE_DI_ICON = IconCreator.create("icons/createDI.svg");
-    private static final Icon PYTHON_ICON = PythonFileType.INSTANCE.getIcon();
-    private static final Icon YAML_ICON = AllIcons.FileTypes.Yaml;
+import static org.fever.utils.Icons.CREATE_DI_ICON;
+import static org.fever.utils.Icons.GO_TO_DI_ICON;
 
+public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
     public @Nullable @GutterName String getName() {
         return "Smart navigation to dependency injection files";
     }
@@ -68,7 +63,7 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
             return new LineMarkerInfo<>(
                     psiElement,
                     psiElement.getTextRange(),
-                    GOTO_DI_ICON,
+                    GO_TO_DI_ICON,
                     (e) -> "Navigate to dependency injection file",
                     new DirectNavigationHandler(diFile),
                     GutterIconRenderer.Alignment.CENTER,
@@ -78,7 +73,7 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
             return new LineMarkerInfo<>(
                     psiElement,
                     psiElement.getTextRange(),
-                    GOTO_DI_ICON,
+                    GO_TO_DI_ICON,
                     (e) -> "Choose dependency injection file",
                     new MultipleFilesNavigationHandler(new ArrayList<>(diFiles)),
                     GutterIconRenderer.Alignment.CENTER,
@@ -142,10 +137,7 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
 
         @Override
         public Icon getIconFor(DIFileType value) {
-            return switch (value) {
-                case YAML -> YAML_ICON;
-                case PYTHON -> PYTHON_ICON;
-            };
+            return value.getIcon();
         }
     }
 
@@ -169,11 +161,7 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
         @Override
         public Icon getIconFor(PsiFile file) {
             String extension = Objects.requireNonNull(file.getVirtualFile().getExtension());
-
-            return switch (DIFileType.fromExtension(extension)) {
-                case YAML -> YAML_ICON;
-                case PYTHON -> PYTHON_ICON;
-            };
+            return DIFileType.fromExtension(extension).getIcon();
         }
 
         @Override
