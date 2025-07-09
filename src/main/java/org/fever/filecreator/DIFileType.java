@@ -1,25 +1,30 @@
 package org.fever.filecreator;
 
+import com.intellij.openapi.fileTypes.LanguageFileType;
+import com.jetbrains.python.PythonFileType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.yaml.YAMLFileType;
+
+import javax.swing.*;
 
 public enum DIFileType {
-    PYTHON("py", "Python"),
-    YAML("yaml", "YAML");
+    PYTHON("py", PythonFileType.INSTANCE),
+    YAML("yaml", YAMLFileType.YML);
 
     private final String extension;
     private final String fileExtension;
-    private final String name;
+    private final LanguageFileType fileType;
 
     /**
      * Constructs a new {@link DIFileType} with the specified extension and name.
      *
      * @param extension the file extension without the dot.
-     * @param name      the name of the file type.
+     * @param fileType the associated {@link LanguageFileType}.
      */
-    DIFileType(@NotNull String extension, @NotNull String name) {
+    DIFileType(@NotNull String extension, LanguageFileType fileType) {
         this.extension = extension;
         this.fileExtension = "." + extension;
-        this.name = name;
+        this.fileType = fileType;
     }
 
     /**
@@ -46,14 +51,34 @@ public enum DIFileType {
      * @return the name of the file type.
      */
     public String getName() {
-        return name;
+        return fileType.getName();
+    }
+
+    /**
+     * Returns the icon associated with the file type.
+     *
+     * @return the icon for the file type.
+     */
+    public Icon getIcon() {
+        return fileType.getIcon();
+    }
+
+    /**
+     * Returns the {@link LanguageFileType} associated with this file type.
+     *
+     * @return the {@link LanguageFileType} for this file type.
+     */
+    public LanguageFileType getFileType() {
+        return fileType;
     }
 
     /**
      * Returns the {@link DIFileType} corresponding to the given file extension.
      *
      * @param extension the file extension to match.
+     *
      * @return the {@link DIFileType} corresponding to the given extension.
+     *
      * @throws IllegalArgumentException if no matching {@link DIFileType} is found.
      */
     public static DIFileType fromExtension(@NotNull String extension) {
