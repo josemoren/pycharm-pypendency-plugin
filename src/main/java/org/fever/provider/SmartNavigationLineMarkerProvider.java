@@ -50,34 +50,34 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
 
         if (diFiles.isEmpty()) {
             return new LineMarkerInfo<>(
-                    psiElement,
-                    psiElement.getTextRange(),
-                    CREATE_DI_ICON,
-                    (e) -> "Create Dependency Injection File",
-                    new CreateDIGutterNavigationHandler(),
-                    GutterIconRenderer.Alignment.CENTER,
-                    () -> "Create Dependency Injection File"
+                psiElement,
+                psiElement.getTextRange(),
+                CREATE_DI_ICON,
+                (e) -> "Create Dependency Injection File",
+                new CreateDIGutterNavigationHandler(),
+                GutterIconRenderer.Alignment.CENTER,
+                () -> "Create Dependency Injection File"
             );
         } else if (diFiles.size() == 1) {
             PsiFile diFile = diFiles.iterator().next();
             return new LineMarkerInfo<>(
-                    psiElement,
-                    psiElement.getTextRange(),
-                    GO_TO_DI_ICON,
-                    (e) -> "Navigate to dependency injection file",
-                    new DirectNavigationHandler(diFile),
-                    GutterIconRenderer.Alignment.CENTER,
-                    () -> "Navigate to dependency injection file"
+                psiElement,
+                psiElement.getTextRange(),
+                GO_TO_DI_ICON,
+                (e) -> "Navigate to dependency injection file",
+                new DirectNavigationHandler(diFile),
+                GutterIconRenderer.Alignment.CENTER,
+                () -> "Navigate to dependency injection file"
             );
         } else {
             return new LineMarkerInfo<>(
-                    psiElement,
-                    psiElement.getTextRange(),
-                    GO_TO_DI_ICON,
-                    (e) -> "Choose dependency injection file",
-                    new MultipleFilesNavigationHandler(new ArrayList<>(diFiles)),
-                    GutterIconRenderer.Alignment.CENTER,
-                    () -> "Choose dependency injection file"
+                psiElement,
+                psiElement.getTextRange(),
+                GO_TO_DI_ICON,
+                (e) -> "Choose dependency injection file",
+                new MultipleFilesNavigationHandler(new ArrayList<>(diFiles)),
+                GutterIconRenderer.Alignment.CENTER,
+                () -> "Choose dependency injection file"
             );
         }
     }
@@ -86,8 +86,8 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
         @Override
         public void navigate(@NotNull MouseEvent e, @NotNull PsiElement element) {
             JBPopupFactory.getInstance()
-                    .createListPopup(new DICreationPopupStep(element))
-                    .show(new RelativePoint(e));
+                .createListPopup(new DICreationPopupStep(element))
+                .show(new RelativePoint(e));
         }
     }
 
@@ -95,17 +95,17 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
         @Override
         public void navigate(@NotNull MouseEvent e, @NotNull PsiElement element) {
             FileEditorManager.getInstance(element.getProject())
-                    .openFile(targetFile.getVirtualFile(), true);
+                .openFile(targetFile.getVirtualFile(), true);
         }
     }
 
     private record MultipleFilesNavigationHandler(ArrayList<PsiFile> diFiles)
-            implements GutterIconNavigationHandler<PsiElement> {
+        implements GutterIconNavigationHandler<PsiElement> {
         @Override
         public void navigate(@NotNull MouseEvent e, @NotNull PsiElement element) {
             JBPopupFactory.getInstance()
-                    .createListPopup(new DIFileSelectionPopupStep(diFiles))
-                    .show(new RelativePoint(e));
+                .createListPopup(new DIFileSelectionPopupStep(diFiles))
+                .show(new RelativePoint(e));
         }
     }
 
@@ -167,7 +167,7 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
         @Override
         public @Nullable PopupStep<?> onChosen(PsiFile selectedFile, boolean finalChoice) {
             FileEditorManager.getInstance(selectedFile.getProject())
-                    .openFile(selectedFile.getVirtualFile(), true);
+                .openFile(selectedFile.getVirtualFile(), true);
             return FINAL_CHOICE;
         }
     }

@@ -57,10 +57,10 @@ public class PythonDILineMarkerProvider extends LineMarkerProviderDescriptor {
         }
 
         return NavigationGutterIconBuilder.create(GO_TO_SOURCE_ICON)
-                .setTarget(sourceCodeFile)
-                .setTooltipText("Navigate to Python class")
-                .setAlignment(GutterIconRenderer.Alignment.CENTER)
-                .createLineMarkerInfo(psiElement);
+            .setTarget(sourceCodeFile)
+            .setTooltipText("Navigate to Python class")
+            .setAlignment(GutterIconRenderer.Alignment.CENTER)
+            .createLineMarkerInfo(psiElement);
     }
 
     private static boolean isFqnString(String stringValue, PsiFile file) {

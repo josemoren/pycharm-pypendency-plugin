@@ -61,9 +61,9 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
     @NotNull
     private GotoTargetHandler.GotoData getGotoDataForExistingPypendency(PsiElement pyClassUnderCaret, Collection<PsiFile> diFiles) {
         return new GotoData(
-                pyClassUnderCaret,
-                diFiles.toArray(new PsiElement[0]),
-                new SmartList<>()
+            pyClassUnderCaret,
+            diFiles.toArray(new PsiElement[0]),
+            new SmartList<>()
         );
     }
 

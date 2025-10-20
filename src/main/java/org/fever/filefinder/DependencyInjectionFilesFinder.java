@@ -16,7 +16,7 @@ public class DependencyInjectionFilesFinder {
 
         if (DIFileType.PYTHON.getFileType().equals(fileType)) {
             allFiles = allFiles.filter(
-                    file -> file.getPath().contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER)
+                file -> file.getPath().contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER)
             );
         }
 

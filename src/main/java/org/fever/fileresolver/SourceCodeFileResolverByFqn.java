@@ -42,8 +42,8 @@ public class SourceCodeFileResolverByFqn {
         SourceFolder[] sourceFolders = contentEntry.getSourceFolders();
 
         return Arrays.stream(sourceFolders)
-                .map(folder -> folder.getJpsElement().getPath().toAbsolutePath().toString())
-                .toList();
+            .map(folder -> folder.getJpsElement().getPath().toAbsolutePath().toString())
+            .toList();
     }
 
     private static Collection<String> getPossibleFilePaths(Collection<String> sourceCodeRootAbsolutePaths, String fqn) {
@@ -62,8 +62,8 @@ public class SourceCodeFileResolverByFqn {
 
             possibleFilePaths.add("%s/%s.%s".formatted(sourceCodeRootAbsolutePath, relativeFilePath, extension));
             possibleFilePaths.add(
-                    "%s/%s/%s.%s".formatted(sourceCodeRootAbsolutePath, relativeFilePath,
-                                            CaseFormatter.camelCaseToSnakeCase(className), extension));
+                "%s/%s/%s.%s".formatted(sourceCodeRootAbsolutePath, relativeFilePath,
+                                        CaseFormatter.camelCaseToSnakeCase(className), extension));
         }
 
         return possibleFilePaths;
