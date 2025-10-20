@@ -7,8 +7,8 @@ import com.intellij.openapi.project.Project;
 public class PypendencyNotifier {
     public static void notify(Project project, String content, NotificationType type) {
         NotificationGroupManager.getInstance()
-                                .getNotificationGroup("Pypendency notification")
-                                .createNotification(content, type)
-                                .notify(project);
+                .getNotificationGroup("Pypendency notification")
+                .createNotification(content, type)
+                .notify(project);
     }
 }

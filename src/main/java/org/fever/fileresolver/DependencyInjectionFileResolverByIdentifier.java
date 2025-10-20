@@ -156,6 +156,7 @@ public class DependencyInjectionFileResolverByIdentifier {
      *
      * @param psiManager the PSI manager
      * @param identifier the FQN to search for
+     *
      * @return collection of all matching DI files
      */
     public static Collection<PsiFile> findAll(PsiManager psiManager, String identifier) {
@@ -165,7 +166,8 @@ public class DependencyInjectionFileResolverByIdentifier {
         GlobalSearchScope scope = GlobalSearchScope.projectScope(psiManager.getProject());
 
         // Find all YAML DI files
-        Collection<VirtualFile> yamlDependencyInjectionFiles = DependencyInjectionFilesFinder.find(YAMLFileType.YML, scope);
+        Collection<VirtualFile> yamlDependencyInjectionFiles = DependencyInjectionFilesFinder.find(YAMLFileType.YML,
+                                                                                                   scope);
 
         // 1. Find files that DEFINE the identifier
         allFiles.addAll(findAllDependencyInjectionFilesInCollection(REGEX_FOR_YAML_DI_FILES,
@@ -178,7 +180,8 @@ public class DependencyInjectionFileResolverByIdentifier {
                                                                     psiManager, cleanIdentifier));
 
         // Find all Python DI files
-        Collection<VirtualFile> pythonDependencyInjectionFiles = DependencyInjectionFilesFinder.find(PythonFileType.INSTANCE, scope);
+        Collection<VirtualFile> pythonDependencyInjectionFiles = DependencyInjectionFilesFinder.find(
+                PythonFileType.INSTANCE, scope);
 
         // 1. Find files that DEFINE the identifier
         for (String regex : REGEX_FOR_PYTHON_MANUALLY_SET_IDENTIFIERS) {
@@ -198,10 +201,11 @@ public class DependencyInjectionFileResolverByIdentifier {
     /**
      * Find all dependency injection files in a collection that match the given identifier.
      *
-     * @param regex the regex pattern to match
-     * @param diFiles the collection of DI files to search
+     * @param regex      the regex pattern to match
+     * @param diFiles    the collection of DI files to search
      * @param psiManager the PSI manager
      * @param identifier the identifier to search for
+     *
      * @return collection of all matching DI files
      */
     private static Collection<PsiFile> findAllDependencyInjectionFilesInCollection(String regex, Collection<VirtualFile> diFiles, PsiManager psiManager, String identifier) {
@@ -228,15 +232,15 @@ public class DependencyInjectionFileResolverByIdentifier {
      * Check if identifier is present in a DI file, using different logic for definition vs usage patterns.
      *
      * @param diFileContent the content of the DI file
-     * @param identifier the identifier to search for
-     * @param matcher the regex matcher
-     * @param regex the regex pattern being used
+     * @param identifier    the identifier to search for
+     * @param matcher       the regex matcher
+     * @param regex         the regex pattern being used
+     *
      * @return true if identifier is found in the file
      */
     private static boolean identifierIsInFile(String diFileContent, String identifier, Matcher matcher, String regex) {
         // For FQN content patterns, we need to search for the identifier in the matched FQN
-        if (regex.equals(YAML_FQN_CONTENT_REGEX) ||
-            regex.equals(PYTHON_FQN_CONTENT_REGEX)) {
+        if (regex.equals(YAML_FQN_CONTENT_REGEX) || regex.equals(PYTHON_FQN_CONTENT_REGEX)) {
             return identifierIsInFqnContent(diFileContent, identifier, matcher);
         }
 
@@ -248,8 +252,9 @@ public class DependencyInjectionFileResolverByIdentifier {
      * Check if identifier is present in the FQN content of a DI file.
      *
      * @param diFileContent the content of the DI file
-     * @param identifier the identifier to search for
-     * @param matcher the regex matcher
+     * @param identifier    the identifier to search for
+     * @param matcher       the regex matcher
+     *
      * @return true if identifier is found in the FQN content of the file
      */
     private static boolean identifierIsInFqnContent(String diFileContent, String identifier, Matcher matcher) {

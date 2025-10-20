@@ -89,8 +89,8 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
         @Override
         public void navigate(@NotNull MouseEvent e, @NotNull PsiElement element) {
             JBPopupFactory.getInstance()
-                          .createListPopup(new DICreationPopupStep(element))
-                          .show(new RelativePoint(e));
+                    .createListPopup(new DICreationPopupStep(element))
+                    .show(new RelativePoint(e));
         }
     }
 
@@ -98,7 +98,7 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
         @Override
         public void navigate(@NotNull MouseEvent e, @NotNull PsiElement element) {
             FileEditorManager.getInstance(element.getProject())
-                             .openFile(targetFile.getVirtualFile(), true);
+                    .openFile(targetFile.getVirtualFile(), true);
         }
     }
 
@@ -107,8 +107,8 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
         @Override
         public void navigate(@NotNull MouseEvent e, @NotNull PsiElement element) {
             JBPopupFactory.getInstance()
-                          .createListPopup(new DIFileSelectionPopupStep(diFiles))
-                          .show(new RelativePoint(e));
+                    .createListPopup(new DIFileSelectionPopupStep(diFiles))
+                    .show(new RelativePoint(e));
         }
     }
 
@@ -172,7 +172,7 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
         @Override
         public @Nullable PopupStep<?> onChosen(PsiFile selectedFile, boolean finalChoice) {
             FileEditorManager.getInstance(selectedFile.getProject())
-                             .openFile(selectedFile.getVirtualFile(), true);
+                    .openFile(selectedFile.getVirtualFile(), true);
             return FINAL_CHOICE;
         }
     }

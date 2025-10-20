@@ -40,8 +40,8 @@ public class SourceCodeFileResolverByFqn {
         SourceFolder[] sourceFolders = contentEntry.getSourceFolders();
 
         return Arrays.stream(sourceFolders)
-                     .map(folder -> folder.getJpsElement().getPath().toAbsolutePath().toString())
-                     .toList();
+                .map(folder -> folder.getJpsElement().getPath().toAbsolutePath().toString())
+                .toList();
     }
 
     private static Collection<String> getPossibleFilePaths(Collection<String> sourceCodeRootAbsolutePaths, String fqn) {
