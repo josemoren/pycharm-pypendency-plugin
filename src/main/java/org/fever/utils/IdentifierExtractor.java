@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.fever.utils.FileTypeByExtensionChecker.isPythonFile;
+import static org.fever.utils.FileTypeByExtensionChecker.isYamlFile;
+
 public class IdentifierExtractor {
     private static final String YAML_IDENTIFIER_GROUP_SELECTOR_REGEX = "^(\\S+):";
     private static final String PYTHON_IDENTIFIER_GROUP_SELECTOR_REGEX = "container_builder\\.set_definition\\(\\s+Definition\\(\\s*\"(\\S+)\",\\s*\"\\S+\"";
@@ -45,14 +48,6 @@ public class IdentifierExtractor {
         }
 
         return EMPTY_LIST;
-    }
-
-    public static Boolean isYamlFile(String extension) {
-        return extension.equals("yaml") || extension.equals("yml");
-    }
-
-    public static Boolean isPythonFile(String extension) {
-        return extension.equals("py");
     }
 
     public static @Nullable List<String> extractIdentifiersFromYaml(String fileContent) {

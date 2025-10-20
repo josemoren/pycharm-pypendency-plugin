@@ -64,10 +64,10 @@ public class ClassArgumentFetcher {
         }
 
         List<String> implementationClassNames = PyClassInheritorsSearch.search(parameterClass, false)
-                .findAll()
-                .stream()
-                .map(PyClass::getName)
-                .toList();
+            .findAll()
+            .stream()
+            .map(PyClass::getName)
+            .toList();
 
         allClassNames.addAll(implementationClassNames);
         return allClassNames;
@@ -77,9 +77,9 @@ public class ClassArgumentFetcher {
         PsiFile dependencyInjectionFile = DependencyInjectionFileResolverByClassName.resolve(project, className);
         List<String> identifiersInDIFile = IdentifierExtractor.extractIdentifiersFromDIFile(dependencyInjectionFile);
         String implementationIdentifier = identifiersInDIFile.stream()
-                .filter(identifier -> identifier.endsWith("." + className))
-                .findFirst()
-                .orElse(null);
+            .filter(identifier -> identifier.endsWith("." + className))
+            .findFirst()
+            .orElse(null);
 
         return new IdentifierItem(implementationIdentifier, parameterClass, parameter);
     }
@@ -91,7 +91,7 @@ public class ClassArgumentFetcher {
         }
 
         List<PyParameter> dunderInitMethodParameters = new ArrayList<>(
-                Arrays.asList(initMethod.getParameterList().getParameters())
+            Arrays.asList(initMethod.getParameterList().getParameters())
         );
         dunderInitMethodParameters.remove(SELF_INDEX_IN_PARAMETER_LIST);
 

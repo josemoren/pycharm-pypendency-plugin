@@ -29,15 +29,14 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
     }
 
     private static final DependencyInjectionFileType[] FILE_TYPES = {
-            new DependencyInjectionFileType(
-                    YAMLFileType.YML,
-                    new String[]{ "^(\\S+):\n\\s*fqn:" }),
-            new DependencyInjectionFileType(
-                    PythonFileType.INSTANCE,
-                    new String[]{
-                            "container(?:_builder)?\\.set\\(\\s*\"(\\S+)",
-                            "container_builder\\.set_definition\\(\\s*Definition\\(\\s*\"(\\S+)"
-                    })
+        new DependencyInjectionFileType(YAMLFileType.YML, new String[]{ "^(\\S+):\n\\s*fqn:" }),
+        new DependencyInjectionFileType(
+            PythonFileType.INSTANCE,
+            new String[]{
+                "container(?:_builder)?\\.set\\(\\s*\"(\\S+)",
+                "container_builder\\.set_definition\\(\\s*Definition\\(\\s*\"(\\S+)"
+            }
+        )
     };
 
     @Nullable
@@ -51,7 +50,7 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
 
         for (DependencyInjectionFileType fileType : FILE_TYPES) {
             Collection<VirtualFile> dependencyInjectionFiles = ReadAction.compute(
-                    () -> DependencyInjectionFilesFinder.find(fileType.fileType(), scope)
+                () -> DependencyInjectionFilesFinder.find(fileType.fileType(), scope)
             );
 
             for (String regex : fileType.identifierRegexes()) {

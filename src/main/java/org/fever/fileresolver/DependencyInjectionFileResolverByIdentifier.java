@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 
 public class DependencyInjectionFileResolverByIdentifier {
     private static final String[] REGEX_FOR_PYTHON_MANUALLY_SET_IDENTIFIERS = {
-            "container(?:_builder)?\\.set\\(\\s*\"(\\S+)\"",
-            "container_builder\\.set_definition\\(\\s*Definition\\(\\s*\"(\\S+)\"",
+        "container(?:_builder)?\\.set\\(\\s*\"(\\S+)\"",
+        "container_builder\\.set_definition\\(\\s*Definition\\(\\s*\"(\\S+)\"",
     };
     private static final String REGEX_FOR_YAML_DI_FILES = "^(\\S+):\n\\s*fqn:";
 
@@ -102,7 +102,8 @@ public class DependencyInjectionFileResolverByIdentifier {
         }
 
         Collection<VirtualFile> pythonDependencyInjectionFiles = DependencyInjectionFilesFinder.find(
-                PythonFileType.INSTANCE, scope);
+            PythonFileType.INSTANCE, scope
+        );
 
         for (String regex : REGEX_FOR_PYTHON_MANUALLY_SET_IDENTIFIERS) {
             PsiFile pythonDependencyInjectionFile = findDependencyInjectionFileInCollection(regex,
@@ -166,8 +167,9 @@ public class DependencyInjectionFileResolverByIdentifier {
         GlobalSearchScope scope = GlobalSearchScope.projectScope(psiManager.getProject());
 
         // Find all YAML DI files
-        Collection<VirtualFile> yamlDependencyInjectionFiles = DependencyInjectionFilesFinder.find(YAMLFileType.YML,
-                                                                                                   scope);
+        Collection<VirtualFile> yamlDependencyInjectionFiles = DependencyInjectionFilesFinder.find(
+            YAMLFileType.YML, scope
+        );
 
         // 1. Find files that DEFINE the identifier
         allFiles.addAll(findAllDependencyInjectionFilesInCollection(REGEX_FOR_YAML_DI_FILES,
@@ -181,13 +183,14 @@ public class DependencyInjectionFileResolverByIdentifier {
 
         // Find all Python DI files
         Collection<VirtualFile> pythonDependencyInjectionFiles = DependencyInjectionFilesFinder.find(
-                PythonFileType.INSTANCE, scope);
+            PythonFileType.INSTANCE, scope
+        );
 
         // 1. Find files that DEFINE the identifier
         for (String regex : REGEX_FOR_PYTHON_MANUALLY_SET_IDENTIFIERS) {
-            allFiles.addAll(findAllDependencyInjectionFilesInCollection(regex,
-                                                                        pythonDependencyInjectionFiles,
-                                                                        psiManager, cleanIdentifier));
+            allFiles.addAll(findAllDependencyInjectionFilesInCollection(
+                regex, pythonDependencyInjectionFiles, psiManager, cleanIdentifier
+            ));
         }
 
         // 2. Find files that contain the FQN in their definitions

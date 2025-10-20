@@ -4,7 +4,6 @@ import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.GutterName;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -18,7 +17,6 @@ import com.jetbrains.python.psi.PyClass;
 import org.fever.filecreator.DIFileType;
 import org.fever.fileresolver.DependencyInjectionFileResolverByIdentifier;
 import org.fever.utils.DIFileOpener;
-import org.fever.utils.IconCreator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,11 +26,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
-public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
-    private static final Icon GOTO_DI_ICON = IconCreator.create("icons/goToDI.svg");
-    private static final Icon CREATE_DI_ICON = IconCreator.create("icons/createDI.svg");
-    private static final Icon PYTHON_ICON = IconCreator.create("icons/python.svg");
+import static org.fever.utils.Icons.CREATE_DI_ICON;
+import static org.fever.utils.Icons.GO_TO_DI_ICON;
 
+public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
     public @Nullable @GutterName String getName() {
         return "Smart navigation to dependency injection files";
     }
@@ -53,34 +50,34 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
 
         if (diFiles.isEmpty()) {
             return new LineMarkerInfo<>(
-                    psiElement,
-                    psiElement.getTextRange(),
-                    CREATE_DI_ICON,
-                    (e) -> "Create Dependency Injection File",
-                    new CreateDIGutterNavigationHandler(),
-                    GutterIconRenderer.Alignment.CENTER,
-                    () -> "Create Dependency Injection File"
+                psiElement,
+                psiElement.getTextRange(),
+                CREATE_DI_ICON,
+                (e) -> "Create Dependency Injection File",
+                new CreateDIGutterNavigationHandler(),
+                GutterIconRenderer.Alignment.CENTER,
+                () -> "Create Dependency Injection File"
             );
         } else if (diFiles.size() == 1) {
             PsiFile diFile = diFiles.iterator().next();
             return new LineMarkerInfo<>(
-                    psiElement,
-                    psiElement.getTextRange(),
-                    GOTO_DI_ICON,
-                    (e) -> "Navigate to dependency injection file",
-                    new DirectNavigationHandler(diFile),
-                    GutterIconRenderer.Alignment.CENTER,
-                    () -> "Navigate to dependency injection file"
+                psiElement,
+                psiElement.getTextRange(),
+                GO_TO_DI_ICON,
+                (e) -> "Navigate to dependency injection file",
+                new DirectNavigationHandler(diFile),
+                GutterIconRenderer.Alignment.CENTER,
+                () -> "Navigate to dependency injection file"
             );
         } else {
             return new LineMarkerInfo<>(
-                    psiElement,
-                    psiElement.getTextRange(),
-                    GOTO_DI_ICON,
-                    (e) -> "Choose dependency injection file",
-                    new MultipleFilesNavigationHandler(new ArrayList<>(diFiles)),
-                    GutterIconRenderer.Alignment.CENTER,
-                    () -> "Choose dependency injection file"
+                psiElement,
+                psiElement.getTextRange(),
+                GO_TO_DI_ICON,
+                (e) -> "Choose dependency injection file",
+                new MultipleFilesNavigationHandler(new ArrayList<>(diFiles)),
+                GutterIconRenderer.Alignment.CENTER,
+                () -> "Choose dependency injection file"
             );
         }
     }
@@ -89,8 +86,8 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
         @Override
         public void navigate(@NotNull MouseEvent e, @NotNull PsiElement element) {
             JBPopupFactory.getInstance()
-                    .createListPopup(new DICreationPopupStep(element))
-                    .show(new RelativePoint(e));
+                .createListPopup(new DICreationPopupStep(element))
+                .show(new RelativePoint(e));
         }
     }
 
@@ -98,46 +95,49 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
         @Override
         public void navigate(@NotNull MouseEvent e, @NotNull PsiElement element) {
             FileEditorManager.getInstance(element.getProject())
-                    .openFile(targetFile.getVirtualFile(), true);
+                .openFile(targetFile.getVirtualFile(), true);
         }
     }
 
     private record MultipleFilesNavigationHandler(ArrayList<PsiFile> diFiles)
-            implements GutterIconNavigationHandler<PsiElement> {
+        implements GutterIconNavigationHandler<PsiElement> {
         @Override
         public void navigate(@NotNull MouseEvent e, @NotNull PsiElement element) {
             JBPopupFactory.getInstance()
-                    .createListPopup(new DIFileSelectionPopupStep(diFiles))
-                    .show(new RelativePoint(e));
+                .createListPopup(new DIFileSelectionPopupStep(diFiles))
+                .show(new RelativePoint(e));
         }
     }
 
-    private static class DICreationPopupStep extends BaseListPopupStep<String> {
+    private static class DICreationPopupStep extends BaseListPopupStep<DIFileType> {
         private final PsiElement element;
         private static final String TITLE = "Choose DI File Format";
-        private static final String[] FORMATS = { "YAML", "Python" };
 
         public DICreationPopupStep(@NotNull PsiElement element) {
-            super(TITLE, FORMATS);
+            super(TITLE, DIFileType.values());
             this.element = element;
         }
 
         @Override
-        public @NotNull String getTextFor(String value) {
-            return value;
+        public @NotNull String getTextFor(DIFileType value) {
+            return value.getName() + " File";
         }
 
         @Override
-        public @Nullable PopupStep<?> onChosen(String selectedValue, boolean finalChoice) {
-            DIFileType type = "YAML".equals(selectedValue) ? DIFileType.YAML : DIFileType.PYTHON;
-
+        public @Nullable PopupStep<?> onChosen(DIFileType selectedValue, boolean finalChoice) {
             Editor editor = FileEditorManager.getInstance(element.getProject()).getSelectedTextEditor();
+
             if (editor == null) {
                 return FINAL_CHOICE;
             }
 
-            DIFileOpener.open(editor, element.getContainingFile(), type);
+            DIFileOpener.open(editor, element.getContainingFile(), selectedValue);
             return FINAL_CHOICE;
+        }
+
+        @Override
+        public Icon getIconFor(DIFileType value) {
+            return value.getIcon();
         }
     }
 
@@ -161,18 +161,13 @@ public class SmartNavigationLineMarkerProvider implements LineMarkerProvider {
         @Override
         public Icon getIconFor(PsiFile file) {
             String extension = Objects.requireNonNull(file.getVirtualFile().getExtension());
-
-            return switch (extension) {
-                case "yaml", "yml" -> AllIcons.FileTypes.Yaml;
-                case "py" -> PYTHON_ICON;
-                default -> AllIcons.FileTypes.Unknown;
-            };
+            return DIFileType.fromExtension(extension).getIcon();
         }
 
         @Override
         public @Nullable PopupStep<?> onChosen(PsiFile selectedFile, boolean finalChoice) {
             FileEditorManager.getInstance(selectedFile.getProject())
-                    .openFile(selectedFile.getVirtualFile(), true);
+                .openFile(selectedFile.getVirtualFile(), true);
             return FINAL_CHOICE;
         }
     }

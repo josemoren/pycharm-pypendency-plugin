@@ -1,27 +1,25 @@
 package org.fever.filecreator.templates;
 
 import com.intellij.openapi.fileTypes.FileType;
-import com.jetbrains.python.PythonFileType;
+import org.fever.filecreator.DIFileType;
 
 public class PythonDIFileTemplate implements DIFileTemplate {
-    private static final String FILE_EXTENSION = ".py";
-    private static final FileType FILE_TYPE = PythonFileType.INSTANCE;
     private static final int ARGUMENT_INDENTATION_SPACES = 16;
     private static final String BASE_TEMPLATE = """
-            from pypendency.argument import Argument
-            from pypendency.builder import ContainerBuilder
-            from pypendency.definition import Definition
+        from pypendency.argument import Argument
+        from pypendency.builder import ContainerBuilder
+        from pypendency.definition import Definition
 
 
-            def load(container_builder: ContainerBuilder) -> None:
-                container_builder.set_definition(
-                    Definition(
-                        "{fqn}",
-                        "{fqn}",
-                        [{arguments}],
-                    )
+        def load(container_builder: ContainerBuilder) -> None:
+            container_builder.set_definition(
+                Definition(
+                    "{fqn}",
+                    "{fqn}",
+                    [{arguments}],
                 )
-            """;
+            )
+        """;
     private static final String ARGUMENT_STATEMENT_BEGINNING = "";
     private static final String MULTIPLE_ARGUMENTS_TEMPLATE_BEGINNING = "# TODO: 👇 Multiple arguments found for %s, leave only one:";
     private static final String MULTIPLE_ARGUMENTS_TEMPLATE_END = "# TODO: 👆";
@@ -31,12 +29,12 @@ public class PythonDIFileTemplate implements DIFileTemplate {
 
     @Override
     public String getFileExtension() {
-        return FILE_EXTENSION;
+        return DIFileType.PYTHON.getFileExtension();
     }
 
     @Override
     public FileType getFileType() {
-        return FILE_TYPE;
+        return DIFileType.PYTHON.getFileType();
     }
 
     @Override

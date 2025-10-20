@@ -29,8 +29,8 @@ import java.util.Objects;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
-import static org.fever.utils.IdentifierExtractor.isPythonFile;
-import static org.fever.utils.IdentifierExtractor.isYamlFile;
+import static org.fever.utils.FileTypeByExtensionChecker.isPythonFile;
+import static org.fever.utils.FileTypeByExtensionChecker.isYamlFile;
 
 public class GotoInjectedImplementationHandler extends GotoTargetHandler {
     public static final String FEATURE_KEY = "navigation.goto.injectedImplementation";
@@ -54,14 +54,13 @@ public class GotoInjectedImplementationHandler extends GotoTargetHandler {
     @Override
     protected @Nullable GotoData getSourceAndTargetElements(Editor editor, PsiFile file) {
         int caretOffset = editor.getCaretModel().getOffset();
-        PsiElement elementUnderCaret = file.findElementAt(caretOffset);
 
+        PsiElement elementUnderCaret = file.findElementAt(caretOffset);
         if (elementUnderCaret == null) {
             return null;
         }
 
         PsiFile injectedImplementationFile = getInjectedImplementation(editor, elementUnderCaret);
-
         if (injectedImplementationFile == null) {
             return null;
         }
@@ -89,8 +88,8 @@ public class GotoInjectedImplementationHandler extends GotoTargetHandler {
         }
 
         String targetFqn = getFqnFromIdentifier(manager, targetIdentifier);
-        PsiFile injectedImplementationSourceCodeFile = SourceCodeFileResolverByFqn.resolve(targetFqn, manager);
 
+        PsiFile injectedImplementationSourceCodeFile = SourceCodeFileResolverByFqn.resolve(targetFqn, manager);
         if (injectedImplementationSourceCodeFile == null) {
             String message = "Could not find the source code file associated to the FQN \"" + targetFqn + "\".";
             PypendencyNotifier.notify(project, message, NotificationType.ERROR);
@@ -110,12 +109,12 @@ public class GotoInjectedImplementationHandler extends GotoTargetHandler {
         }
 
         int targetClassIndexInInit = Arrays.stream(initMethodParameters)
-                .filter(parameter -> targetClass.equals(
-                        ClassArgumentParser.parse(parameter.getText())))
-                .findFirst()
-                .map(Arrays.asList(initMethodParameters)::indexOf)
-                .map(index -> index - 1)
-                .orElse(-1);
+            .filter(parameter -> targetClass.equals(
+                ClassArgumentParser.parse(parameter.getText())))
+            .findFirst()
+            .map(Arrays.asList(initMethodParameters)::indexOf)
+            .map(index -> index - 1)
+            .orElse(-1);
 
         if (targetClassIndexInInit < 0) {
             String message = "Could not find the injected implementation for \"" + targetClass + "\".\nCheck that the class is properly type-hinted in the __init__ method.";
@@ -134,17 +133,17 @@ public class GotoInjectedImplementationHandler extends GotoTargetHandler {
 
         if (isPythonFile(diFileExtension)) {
             argumentsInDIFile = Pattern.compile(PYTHON_ARGUMENT_IDENTIFIER_SELECTOR_REGEX)
-                    .matcher(dependencyInjectionFileText)
-                    .results()
-                    .map(MatchResult::group)
-                    .map(x -> x.replaceAll("[^\\w.]", ""))
-                    .toArray(String[]::new);
+                .matcher(dependencyInjectionFileText)
+                .results()
+                .map(MatchResult::group)
+                .map(x -> x.replaceAll("[^\\w.]", ""))
+                .toArray(String[]::new);
         }
 
         int numberOfArgumentsInInitMethod = initMethodParameters.length - 1;
         if (numberOfArgumentsInInitMethod != argumentsInDIFile.length) {
             String message = "Could not find the injected implementation for \"%s\".\nThe __init__ method has %d arguments, but the DI file has %d injected arguments.".formatted(
-                    targetClass, numberOfArgumentsInInitMethod, argumentsInDIFile.length);
+                targetClass, numberOfArgumentsInInitMethod, argumentsInDIFile.length);
             PypendencyNotifier.notify(dependencyInjectionFile.getProject(), message, NotificationType.ERROR);
             return null;
         }

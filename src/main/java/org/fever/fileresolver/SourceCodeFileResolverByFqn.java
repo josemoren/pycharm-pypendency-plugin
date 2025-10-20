@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import org.fever.filecreator.DIFileType;
 import org.fever.utils.CaseFormatter;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,6 +30,7 @@ public class SourceCodeFileResolverByFqn {
                 return file;
             }
         }
+
         return null;
     }
 
@@ -40,39 +42,36 @@ public class SourceCodeFileResolverByFqn {
         SourceFolder[] sourceFolders = contentEntry.getSourceFolders();
 
         return Arrays.stream(sourceFolders)
-                .map(folder -> folder.getJpsElement().getPath().toAbsolutePath().toString())
-                .toList();
+            .map(folder -> folder.getJpsElement().getPath().toAbsolutePath().toString())
+            .toList();
     }
 
     private static Collection<String> getPossibleFilePaths(Collection<String> sourceCodeRootAbsolutePaths, String fqn) {
         String fqnWithSlashes = fqn.replace(".", "/");
         String relativeFilePath = fqnWithSlashes.substring(0, fqnWithSlashes.lastIndexOf("/"));
         Collection<String> possibleFilePaths = new ArrayList<>();
+        String extension = DIFileType.PYTHON.getExtension();
+        String className = fqn.substring(fqn.lastIndexOf(".") + 1);
 
         for (String sourceCodeRootAbsolutePath : sourceCodeRootAbsolutePaths) {
             String folderName = sourceCodeRootAbsolutePath.substring(sourceCodeRootAbsolutePath.lastIndexOf("/") + 1);
-            String className = fqn.substring(fqn.lastIndexOf(".") + 1);
 
             if (relativeFilePath.startsWith(folderName + "/")) {
                 relativeFilePath = relativeFilePath.substring(folderName.length() + 1);
             }
 
-            possibleFilePaths.add(sourceCodeRootAbsolutePath + "/" + relativeFilePath + ".py");
+            possibleFilePaths.add("%s/%s.%s".formatted(sourceCodeRootAbsolutePath, relativeFilePath, extension));
             possibleFilePaths.add(
-                    sourceCodeRootAbsolutePath + "/" + relativeFilePath + "/" + CaseFormatter.camelCaseToSnakeCase(
-                            className) + ".py");
+                "%s/%s/%s.%s".formatted(sourceCodeRootAbsolutePath, relativeFilePath,
+                                        CaseFormatter.camelCaseToSnakeCase(className), extension));
         }
+
         return possibleFilePaths;
     }
 
 
     public static @Nullable PsiFile getFileFromAbsolutePath(String absolutePath, PsiManager psiManager) {
         VirtualFile file = LocalFileSystem.getInstance().findFileByPath(absolutePath);
-
-        if (file != null) {
-            return psiManager.findFile(file);
-        }
-
-        return null;
+        return file != null ? psiManager.findFile(file) : null;
     }
 }

@@ -10,16 +10,15 @@ import com.intellij.psi.PsiFile;
 import com.jetbrains.python.psi.PyStringLiteralExpression;
 import org.fever.fileresolver.SourceCodeFileResolverByFqn;
 import org.fever.utils.FqnExtractor;
-import org.fever.utils.IconCreator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
 import static org.fever.codeInsight.GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER;
+import static org.fever.utils.Icons.GO_TO_SOURCE_ICON;
 
 public class PythonDILineMarkerProvider extends LineMarkerProviderDescriptor {
-    private static final Icon ICON = IconCreator.create("icons/goToSource.svg");
     public static final String PYTHON_FQN_REGEX = "^[a-zA-Z_][a-zA-Z0-9_]*(?:\\.[a-zA-Z_][a-zA-Z0-9_]*)*$";
 
     @Override
@@ -29,7 +28,7 @@ public class PythonDILineMarkerProvider extends LineMarkerProviderDescriptor {
 
     @Override
     public @Nullable Icon getIcon() {
-        return ICON;
+        return GO_TO_SOURCE_ICON;
     }
 
     @Override
@@ -57,11 +56,11 @@ public class PythonDILineMarkerProvider extends LineMarkerProviderDescriptor {
             return null;
         }
 
-        return NavigationGutterIconBuilder.create(ICON)
-                .setTarget(sourceCodeFile)
-                .setTooltipText("Navigate to Python class")
-                .setAlignment(GutterIconRenderer.Alignment.CENTER)
-                .createLineMarkerInfo(psiElement);
+        return NavigationGutterIconBuilder.create(GO_TO_SOURCE_ICON)
+            .setTarget(sourceCodeFile)
+            .setTooltipText("Navigate to Python class")
+            .setAlignment(GutterIconRenderer.Alignment.CENTER)
+            .createLineMarkerInfo(psiElement);
     }
 
     private static boolean isFqnString(String stringValue, PsiFile file) {
