@@ -7,6 +7,6 @@ New Features ({{version}}):
       <li>Icon to go from the Python class to the DI file is rendered in the <b>class</b> gutter line.</li>
       <li>Icon to go from the DI file to the Python class is rendered in the <b>fqn</b> gutter line.</li>
       <li>Implemented create DI file from a specific Python class icon.</li>
-      <li>If a fqn is used in different files, all of them are shown.</li>
+      <li>If a FQN is used in different files, all of them are shown.</li>
     </ul>
 </ul>
