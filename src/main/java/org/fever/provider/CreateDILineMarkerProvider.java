@@ -65,8 +65,8 @@ public class CreateDILineMarkerProvider implements LineMarkerProvider {
 
             assert classFqn != null;
             JBPopupFactory.getInstance()
-                          .createListPopup(new DICreationPopupStep(element))
-                          .show(new RelativePoint(e));
+                    .createListPopup(new DICreationPopupStep(element))
+                    .show(new RelativePoint(e));
         }
     }
 
