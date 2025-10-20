@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 @Service
 @State(
         name = "ReferenceCache",
-        storages = {@Storage(StoragePathMacros.CACHE_FILE)}
+        storages = { @Storage(StoragePathMacros.CACHE_FILE) }
 )
 public final class ResolutionCache implements PersistentStateComponent<ResolutionCache.State> {
     public static class State {

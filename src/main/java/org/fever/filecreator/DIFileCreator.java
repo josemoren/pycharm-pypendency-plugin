@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DIFileCreator {
@@ -84,8 +83,8 @@ public class DIFileCreator {
 
     private static long numberOfImplementationsForParameter(List<IdentifierItem> initArgumentsForParameter) {
         return initArgumentsForParameter.stream()
-                                        .filter(x -> x.identifier != null)
-                                        .count();
+                .filter(x -> x.identifier != null)
+                .count();
     }
 
     private static OrderedHashMap<PyParameter, List<IdentifierItem>> groupIdentifiersByParameter(Collection<IdentifierItem> identifiers) {
@@ -96,7 +95,7 @@ public class DIFileCreator {
 
     private static void appendWithIndentation(StringBuilder builder, int numberOfSpaces, String content) {
         builder.append("\n")
-               .append(" ".repeat(numberOfSpaces))
-               .append(content);
+                .append(" ".repeat(numberOfSpaces))
+                .append(content);
     }
 }
