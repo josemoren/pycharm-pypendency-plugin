@@ -45,9 +45,9 @@ public class PythonLineMarkerProvider extends LineMarkerProviderDescriptor {
         }
 
         return NavigationGutterIconBuilder.create(ICON)
-                                          .setTarget(diFile)
-                                          .setTooltipText("Navigate to dependency injection file")
-                                          .setAlignment(GutterIconRenderer.Alignment.CENTER)
-                                          .createLineMarkerInfo(pyClass);
+                .setTarget(diFile)
+                .setTooltipText("Navigate to dependency injection file")
+                .setAlignment(GutterIconRenderer.Alignment.CENTER)
+                .createLineMarkerInfo(pyClass);
     }
 }
