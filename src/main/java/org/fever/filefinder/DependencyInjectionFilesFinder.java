@@ -15,7 +15,8 @@ public class DependencyInjectionFilesFinder {
         Stream<VirtualFile> allFiles = FileTypeIndex.getFiles(fileType, scope).stream();
 
         if (PythonFileType.INSTANCE.equals(fileType)) {
-            allFiles = allFiles.filter(file -> file.getPath().contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER));
+            allFiles = allFiles.filter(
+                    file -> file.getPath().contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER));
         }
 
         return allFiles.toList();

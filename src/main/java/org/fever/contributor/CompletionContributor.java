@@ -1,6 +1,7 @@
 package org.fever.contributor;
 
-import com.intellij.codeInsight.completion.*;
+import com.intellij.codeInsight.completion.CompletionParameters;
+import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiDirectory;
@@ -17,6 +18,7 @@ import java.util.List;
 
 public class CompletionContributor extends com.intellij.codeInsight.completion.CompletionContributor {
     private static final String INTELLIJ_DEFAULT_STRING = "IntellijIdeaRulezzz "; // https://intellij-support.jetbrains.com/hc/en-us/community/posts/4411826210066-How-to-deal-with-INTELLIJIDEARULEZZZ-in-Reference-Code-Completion
+
     public CompletionContributor() {
     }
 
@@ -24,9 +26,11 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
     public void fillCompletionVariants(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
         ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
         PsiElement element = parameters.getPosition().getContainingFile().findElementAt(parameters.getOffset());
+
         if (!isDependencyInjectionStatement(element)) {
             return;
         }
+
         String text = element.getText()
                 .replace(INTELLIJ_DEFAULT_STRING, "")
                 .replaceAll("[\"']", "");
@@ -34,10 +38,12 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
         String cleanIdentifier = text.replace("@", "");
         String projectName = parameters.getPosition().getProject().getName();
         List<String> completions = resolutionCache.fuzzyFindIdentifiersMatching(projectName, cleanIdentifier);
+
         for (String completion : completions) {
             if (!text.startsWith("@") && isInDependencyInjectionFolder(element)) {
                 completion = "@" + completion;
             }
+
             result.addElement(LookupElementBuilder.create(completion).withIcon(AllIcons.Nodes.Annotationtype));
         }
     }
@@ -52,9 +58,11 @@ public class CompletionContributor extends com.intellij.codeInsight.completion.C
 
     private boolean isInDependencyInjectionFolder(@NotNull PsiElement element) {
         PsiDirectory containingDirectory = element.getContainingFile().getOriginalFile().getContainingDirectory();
+
         if (containingDirectory == null) {
             return false;
         }
+
         String folderPath = containingDirectory.toString();
         return folderPath.contains(GotoPypendencyOrCodeHandler.DEPENDENCY_INJECTION_FOLDER);
     }

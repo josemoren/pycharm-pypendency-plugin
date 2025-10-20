@@ -48,7 +48,6 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
     protected @Nullable GotoData getSourceAndTargetElements(Editor editor, PsiFile file) {
         PyClass pyClassUnderCaret = PyClassUnderCaretFinder.find(editor, file);
         String fqn = pyClassUnderCaret.getQualifiedName();
-
         PsiFile pypendencyDefinitionFile = DependencyInjectionFileResolverByIdentifier.resolve(file.getManager(), fqn);
 
         if (pypendencyDefinitionFile != null) {
@@ -60,12 +59,8 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
 
     @NotNull
     private GotoTargetHandler.GotoData getGotoDataForExistingPypendency(PsiElement pyClassUnderCaret, PsiFile pypendencyDefinition) {
-        PsiElement[] targets = new PsiElement[]{pypendencyDefinition};
-        return new GotoData(
-                pyClassUnderCaret,
-                targets,
-                new SmartList<>()
-        );
+        PsiElement[] targets = new PsiElement[]{ pypendencyDefinition };
+        return new GotoData(pyClassUnderCaret, targets, new SmartList<>());
     }
 
     @NotNull

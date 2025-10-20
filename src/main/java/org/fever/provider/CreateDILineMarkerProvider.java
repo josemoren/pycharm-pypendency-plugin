@@ -73,7 +73,7 @@ public class CreateDILineMarkerProvider implements LineMarkerProvider {
     private static class DICreationPopupStep extends BaseListPopupStep<String> {
         private final PsiElement element;
         private static final String TITLE = "Choose DI File Format";
-        private static final String[] FORMATS = {"YAML", "Python"};
+        private static final String[] FORMATS = { "YAML", "Python" };
 
         public DICreationPopupStep(@NotNull PsiElement element) {
             super(TITLE, FORMATS);

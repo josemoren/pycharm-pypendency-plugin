@@ -51,8 +51,7 @@ public class YamlLineMarkerProvider extends LineMarkerProviderDescriptor {
             return null;
         }
 
-        return NavigationGutterIconBuilder
-                .create(ICON)
+        return NavigationGutterIconBuilder.create(ICON)
                 .setTarget(sourceCodeFile)
                 .setTooltipText("Navigate to Python class")
                 .setAlignment(GutterIconRenderer.Alignment.CENTER)

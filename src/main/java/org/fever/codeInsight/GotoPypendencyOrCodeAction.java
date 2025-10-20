@@ -20,9 +20,10 @@ public class GotoPypendencyOrCodeAction extends PresentableActionHandlerBasedAct
 
     @Override
     @NotNull
-    protected CodeInsightActionHandler getHandler(){
+    protected CodeInsightActionHandler getHandler() {
         PsiFile file = this.anActionEvent.getData(DataKey.create("psi.File"));
         assert file != null;
+
         if (isDependencyInjectionFile(file)) {
             return new GotoCodeHandler(this.anActionEvent);
         } else {

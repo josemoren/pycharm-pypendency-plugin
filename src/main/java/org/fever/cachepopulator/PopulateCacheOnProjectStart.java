@@ -24,15 +24,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-
 public class PopulateCacheOnProjectStart implements ProjectActivity {
-    private record DependencyInjectionFileType(FileType fileType, String[] identifierRegexes) {}
+    private record DependencyInjectionFileType(FileType fileType, String[] identifierRegexes) {
+    }
+
     private static final DependencyInjectionFileType[] FILE_TYPES = {
             new DependencyInjectionFileType(
                     YAMLFileType.YML,
-                    new String[]{
-                            "^(\\S+):\n\\s*fqn:"
-                    }),
+                    new String[]{ "^(\\S+):\n\\s*fqn:" }),
             new DependencyInjectionFileType(
                     PythonFileType.INSTANCE,
                     new String[]{
@@ -51,14 +50,20 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
         int initialNumberOfCachedIdentifiers = resolutionCache.countIdentifiers(projectName);
 
         for (DependencyInjectionFileType fileType : FILE_TYPES) {
-            Collection<VirtualFile> dependencyInjectionFiles = ReadAction.compute(() -> DependencyInjectionFilesFinder.find(fileType.fileType(), scope));
+            Collection<VirtualFile> dependencyInjectionFiles = ReadAction.compute(
+                    () -> DependencyInjectionFilesFinder.find(fileType.fileType(), scope)
+            );
+
             for (String regex : fileType.identifierRegexes()) {
                 Matcher matcher = Pattern.compile(regex).matcher("");
+
                 for (VirtualFile file : dependencyInjectionFiles) {
                     PsiFile psiFile = ReadAction.compute(() -> psiManager.findFile(file));
+
                     if (psiFile == null) {
                         continue;
                     }
+
                     cacheAllIdentifiersDefinedInFile(file, psiFile, matcher, projectName);
                 }
             }
@@ -66,7 +71,8 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
 
         int currentNumberOfCachedIdentifiers = resolutionCache.countIdentifiers(projectName);
         if (initialNumberOfCachedIdentifiers == 0 && currentNumberOfCachedIdentifiers != 0) {
-            String message = "Populated the Pypendency cache for " + projectName + " with " + currentNumberOfCachedIdentifiers + " identifiers";
+            String message = "Populated the Pypendency cache for %s with %d identifiers".formatted(projectName,
+                                                                                                   currentNumberOfCachedIdentifiers);
             PypendencyNotifier.notify(project, message, NotificationType.INFORMATION);
         }
 
@@ -77,6 +83,7 @@ public class PopulateCacheOnProjectStart implements ProjectActivity {
         ResolutionCache.State resolutionCache = ResolutionCache.getInstance();
         String fileContent = ReadAction.compute(psiFile::getText);
         matcher.reset(fileContent);
+
         while (matcher.find()) {
             String identifier = matcher.group(1);
             String cleanIdentifier = identifier.replaceAll("[\"'@,]", "");
