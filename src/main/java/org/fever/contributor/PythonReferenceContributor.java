@@ -11,7 +11,7 @@ public class PythonReferenceContributor extends PsiReferenceContributor {
     public void registerReferenceProviders(PsiReferenceRegistrar registrar) {
         registrar.registerReferenceProvider(
                 PlatformPatterns.psiElement(PsiLiteralValue.class)
-                                .inFile(PlatformPatterns.psiFile()),
+                        .inFile(PlatformPatterns.psiFile()),
                 new PythonReferenceProvider()
         );
     }

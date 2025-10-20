@@ -110,12 +110,12 @@ public class GotoInjectedImplementationHandler extends GotoTargetHandler {
         }
 
         int targetClassIndexInInit = Arrays.stream(initMethodParameters)
-                                           .filter(parameter -> targetClass.equals(
-                                                   ClassArgumentParser.parse(parameter.getText())))
-                                           .findFirst()
-                                           .map(Arrays.asList(initMethodParameters)::indexOf)
-                                           .map(index -> index - 1)
-                                           .orElse(-1);
+                .filter(parameter -> targetClass.equals(
+                        ClassArgumentParser.parse(parameter.getText())))
+                .findFirst()
+                .map(Arrays.asList(initMethodParameters)::indexOf)
+                .map(index -> index - 1)
+                .orElse(-1);
 
         if (targetClassIndexInInit < 0) {
             String message = "Could not find the injected implementation for \"" + targetClass + "\".\nCheck that the class is properly type-hinted in the __init__ method.";
@@ -134,11 +134,11 @@ public class GotoInjectedImplementationHandler extends GotoTargetHandler {
 
         if (isPythonFile(diFileExtension)) {
             argumentsInDIFile = Pattern.compile(PYTHON_ARGUMENT_IDENTIFIER_SELECTOR_REGEX)
-                                       .matcher(dependencyInjectionFileText)
-                                       .results()
-                                       .map(MatchResult::group)
-                                       .map(x -> x.replaceAll("[^\\w.]", ""))
-                                       .toArray(String[]::new);
+                    .matcher(dependencyInjectionFileText)
+                    .results()
+                    .map(MatchResult::group)
+                    .map(x -> x.replaceAll("[^\\w.]", ""))
+                    .toArray(String[]::new);
         }
 
         int numberOfArgumentsInInitMethod = initMethodParameters.length - 1;

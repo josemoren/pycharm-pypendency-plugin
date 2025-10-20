@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.Collection;
 import java.util.List;
 
 
@@ -49,18 +48,18 @@ public class GotoPypendencyOrCodeHandler extends GotoTargetHandler {
     protected @Nullable GotoData getSourceAndTargetElements(Editor editor, PsiFile file) {
         PyClass pyClassUnderCaret = PyClassUnderCaretFinder.find(editor, file);
         String fqn = pyClassUnderCaret.getQualifiedName();
-        Collection<PsiFile> diFiles = DependencyInjectionFileResolverByIdentifier.findAll(file.getManager(), fqn);
+        PsiFile pypendencyDefinitionFile = DependencyInjectionFileResolverByIdentifier.resolve(file.getManager(), fqn);
 
-        if (!diFiles.isEmpty()) {
-            return getGotoDataForExistingPypendency(pyClassUnderCaret, diFiles);
+        if (pypendencyDefinitionFile != null) {
+            return getGotoDataForExistingPypendency(pyClassUnderCaret, pypendencyDefinitionFile);
         }
 
         return getGotoDataForNewPypendency(editor, file, pyClassUnderCaret);
     }
 
     @NotNull
-    private GotoTargetHandler.GotoData getGotoDataForExistingPypendency(PsiElement pyClassUnderCaret, Collection<PsiFile> diFiles) {
-        PsiElement[] targets = diFiles.toArray(new PsiElement[0]);
+    private GotoTargetHandler.GotoData getGotoDataForExistingPypendency(PsiElement pyClassUnderCaret, PsiFile pypendencyDefinition) {
+        PsiElement[] targets = new PsiElement[]{ pypendencyDefinition };
         return new GotoData(pyClassUnderCaret, targets, new SmartList<>());
     }
 

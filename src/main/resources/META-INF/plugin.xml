@@ -42,9 +42,11 @@
     <backgroundPostStartupActivity implementation="org.fever.cachepopulator.PopulateCacheOnProjectStart"/>
     <notificationGroup id="Pypendency notification" displayType="BALLOON"/>
     <codeInsight.lineMarkerProvider language="Python"
-                                    implementationClass="org.fever.provider.SmartNavigationLineMarkerProvider"/>
+                                    implementationClass="org.fever.provider.PythonLineMarkerProvider"/>
     <codeInsight.lineMarkerProvider language="yaml"
                                     implementationClass="org.fever.provider.YamlLineMarkerProvider"/>
+    <codeInsight.lineMarkerProvider language="Python"
+                                    implementationClass="org.fever.provider.CreateDILineMarkerProvider"/>
     <codeInsight.lineMarkerProvider language="Python"
                                     implementationClass="org.fever.provider.PythonDILineMarkerProvider"/>
   </extensions>
