@@ -54,8 +54,7 @@ public final class ResolutionCache implements PersistentStateComponent<Resolutio
             return this.getResolutionCacheForProject(projectName)
                 .keySet()
                 .stream()
-                .map(String::toLowerCase)
-                .filter(key -> key.contains(identifier.toLowerCase()))
+                .filter(key -> key.toLowerCase().contains(identifier.toLowerCase()))
                 .toList();
         }
     }
